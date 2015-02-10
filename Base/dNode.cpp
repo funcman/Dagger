@@ -33,6 +33,14 @@ dNode* dNode::GetNext() {
     return 0;
 }
 
+void dNode::SetPrev(dNode* node) {
+    prev_ = node;
+}
+
+void dNode::SetNext(dNode* node) {
+    next_ = node;
+}
+
 bool dNode::InsertBefore(dNode* node) {
     if (prev_ && IsValid()) {
         if (prev_->IsValid() && node->IsValid()) {

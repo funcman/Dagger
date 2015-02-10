@@ -7,12 +7,17 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		311E57C91A89CC590017A841 /* dList.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 311E57C71A89CC590017A841 /* dList.cpp */; };
+		311E57CA1A89CC590017A841 /* dList.h in Headers */ = {isa = PBXBuildFile; fileRef = 311E57C81A89CC590017A841 /* dList.h */; };
+		311E57CB1A89D1E40017A841 /* dNode.h in Headers */ = {isa = PBXBuildFile; fileRef = 3138E7F11A81EA6C00F3508E /* dNode.h */; };
 		3138E7F51A81EAAE00F3508E /* dNode.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3138E7F41A81EAAE00F3508E /* dNode.cpp */; };
 		3138E7F81A81F0F300F3508E /* dBuffer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3138E7F61A81F0F300F3508E /* dBuffer.cpp */; };
 		3138E7F91A81F0F300F3508E /* dBuffer.h in Headers */ = {isa = PBXBuildFile; fileRef = 3138E7F71A81F0F300F3508E /* dBuffer.h */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		311E57C71A89CC590017A841 /* dList.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = dList.cpp; sourceTree = "<group>"; };
+		311E57C81A89CC590017A841 /* dList.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = dList.h; sourceTree = "<group>"; };
 		3138E7EA1A81EA3D00F3508E /* libBase.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libBase.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		3138E7F11A81EA6C00F3508E /* dNode.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = dNode.h; sourceTree = "<group>"; };
 		3138E7F41A81EAAE00F3508E /* dNode.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = dNode.cpp; sourceTree = "<group>"; };
@@ -53,6 +58,7 @@
 			children = (
 				3138E7F71A81F0F300F3508E /* dBuffer.h */,
 				3138E7F11A81EA6C00F3508E /* dNode.h */,
+				311E57C81A89CC590017A841 /* dList.h */,
 			);
 			name = Include;
 			sourceTree = "<group>";
@@ -62,6 +68,7 @@
 			children = (
 				3138E7F61A81F0F300F3508E /* dBuffer.cpp */,
 				3138E7F41A81EAAE00F3508E /* dNode.cpp */,
+				311E57C71A89CC590017A841 /* dList.cpp */,
 			);
 			name = Source;
 			sourceTree = "<group>";
@@ -74,6 +81,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				3138E7F91A81F0F300F3508E /* dBuffer.h in Headers */,
+				311E57CB1A89D1E40017A841 /* dNode.h in Headers */,
+				311E57CA1A89CC590017A841 /* dList.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -135,6 +144,7 @@
 			files = (
 				3138E7F81A81F0F300F3508E /* dBuffer.cpp in Sources */,
 				3138E7F51A81EAAE00F3508E /* dNode.cpp in Sources */,
+				311E57C91A89CC590017A841 /* dList.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -250,6 +260,7 @@
 				3138E7F01A81EA3D00F3508E /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
