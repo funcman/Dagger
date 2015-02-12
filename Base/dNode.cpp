@@ -8,7 +8,7 @@ dNode::dNode() {
 }
 
 bool dNode::IsValid() {
-    return this_ && (this_==(long)next_+(long)prev_);
+    return (this_==(long)next_+(long)prev_);
 }
 
 void dNode::SetThis() {
