@@ -13,26 +13,26 @@ void DrawPixel(int x, int y, int color) {
 
 #ifndef __GNUC__
     __asm {
-        mov		eax, y
-        cmp		eax, clipTop
-        jl		loc_PutPixel_exit
-        cmp		eax, clipBottom
-        jge		loc_PutPixel_exit
+        mov     eax, y
+        cmp     eax, clipTop
+        jl      loc_PutPixel_exit
+        cmp     eax, clipBottom
+        jge     loc_PutPixel_exit
 
-        mov		ebx, x
-        cmp		ebx, clipLeft
-        jl		loc_PutPixel_exit
-        cmp		ebx, clipRight
-        jge		loc_PutPixel_exit
+        mov     ebx, x
+        cmp     ebx, clipLeft
+        jl      loc_PutPixel_exit
+        cmp     ebx, clipRight
+        jge     loc_PutPixel_exit
 
-        mov		ecx, pitch
-        mul		ecx
-        add		eax, ebx
-        add		eax, ebx
-        mov		edi, frameBuffer
-        add		edi, eax
-        mov		eax, color
-        mov		[edi], ax
+        mov     ecx, pitch
+        mul     ecx
+        add     eax, ebx
+        add     eax, ebx
+        mov     edi, frameBuffer
+        add     edi, eax
+        mov     eax, color
+        mov     [edi], ax
 loc_PutPixel_exit:
     }
 #else
@@ -74,16 +74,16 @@ void DrawPixelFast(int x, int y, int color) {
 
 #ifndef __GNUC__
     __asm {
-        mov		eax, y
-        mov		ebx, x
-        mov		ecx, pitch
-        mul		ecx
-        add		eax, ebx
-        add		eax, ebx
-        mov		edi, frameBuffer
-        add		edi, eax
-        mov		eax, color
-        mov		[edi], ax
+        mov     eax, y
+        mov     ebx, x
+        mov     ecx, pitch
+        mul     ecx
+        add     eax, ebx
+        add     eax, ebx
+        mov     edi, frameBuffer
+        add     edi, eax
+        mov     eax, color
+        mov     [edi], ax
     }
 #else
     __asm__(
@@ -118,46 +118,46 @@ void DrawPixelAlpha(int x, int y, int color, int alpha) {
     __asm
     {
         mov     eax, y
-        cmp		eax, clipTop
-        jl		loc_PutPixelAlpha_exit
-        cmp		eax, clipBottom
-        jge		loc_PutPixelAlpha_exit
+        cmp     eax, clipTop
+        jl      loc_PutPixelAlpha_exit
+        cmp     eax, clipBottom
+        jge     loc_PutPixelAlpha_exit
 
-        mov		ebx, x
-        cmp		ebx, clipLeft
-        jl		loc_PutPixelAlpha_exit
-        cmp		ebx, clipRight
-        jge		loc_PutPixelAlpha_exit
+        mov     ebx, x
+        cmp     ebx, clipLeft
+        jl      loc_PutPixelAlpha_exit
+        cmp     ebx, clipRight
+        jge     loc_PutPixelAlpha_exit
 
-        mov		ecx, pitch
-        mul		ecx
+        mov     ecx, pitch
+        mul     ecx
         add     eax, ebx
         add     eax, ebx
-        mov		edi, frameBuffer
+        mov     edi, frameBuffer
         add     edi, eax
 
         mov     ecx, color
-        mov		ax, cx
-        shl		eax, 16
-        mov		ax, cx
-        and		eax, 0x07e0f81f
-        mov		cx, [edi]
-        mov		bx, cx
-        shl		ebx, 16
-        mov		bx, cx
-        and		ebx, 0x07e0f81f
-        mov		ecx, alpha
-        mul		ecx
-        neg		ecx
-        add		ecx, 32
+        mov     ax, cx
+        shl     eax, 16
+        mov     ax, cx
+        and     eax, 0x07e0f81f
+        mov     cx, [edi]
+        mov     bx, cx
+        shl     ebx, 16
+        mov     bx, cx
+        and     ebx, 0x07e0f81f
+        mov     ecx, alpha
+        mul     ecx
+        neg     ecx
+        add     ecx, 32
         xchg	eax, ebx
-        mul		ecx
-        add		eax, ebx
-        shr		eax, 5
-        and		eax, 0x07e0f81f
-        mov		cx, ax
-        shr		eax, 16
-        or		ax, cx
+        mul     ecx
+        add     eax, ebx
+        shr     eax, 5
+        and     eax, 0x07e0f81f
+        mov     cx, ax
+        shr     eax, 16
+        or      ax, cx
         mov     [edi], ax
 loc_PutPixelAlpha_exit:
     }
