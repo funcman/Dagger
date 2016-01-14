@@ -64,11 +64,6 @@ loc_PutPixel_exit:
         "loc_PutPixel_exit:"
         :
         :"b"(x), "a"(y), "g"(color), "g"(clipTop), "g"(clipBottom), "g"(clipLeft), "g"(clipRight), "c"(pitch), "D"(frameBuffer)
-    #ifdef __x86_64__
-        :"%rax", "%ebx", "%ecx", "%edx", "%rdi", "memory"
-    #else
-        :"%eax", "%ebx", "%ecx", "%edx", "%edi", "memory"
-    #endif
     );
 #endif
 }
@@ -106,11 +101,6 @@ void DrawPixelFast(int x, int y, int color) {
     #endif
         :
         :"b"(x), "a"(y), "c"(pitch), "g"(color), "D"(frameBuffer)
-    #ifdef __x86_64__
-        :"%rax", "%ebx", "%rdi", "memory"
-    #else
-        :"%eax", "%ebx", "%edi", "memory"
-    #endif
     );
 #endif
 }
@@ -229,11 +219,6 @@ loc_PutPixelAlpha_exit:
         "loc_PutPixelAlpha_exit:"
         :
         :"b"(x), "a"(y), "g"(color), "g"(alpha), "g"(clipTop), "g"(clipBottom), "g"(clipLeft), "g"(clipRight), "c"(pitch), "D"(frameBuffer)
-    #ifdef __x86_64__
-        :"%rax", "%ebx", "%ecx", "%edx", "%rdi", "memory"
-    #else
-        :"%eax", "%ebx", "%ecx", "%edx", "%edi", "memory"
-    #endif
     );
 #endif
 }
