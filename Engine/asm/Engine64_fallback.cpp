@@ -1,10 +1,9 @@
 // ==========================================================================
 // Engine64_fallback.cpp - C++ fallback for Engine pixel/color routines.
 //
-// Used on architectures that do not have an assembly implementation (e.g.
-// Apple Silicon / aarch64). The functions below match the contract in
-// Engine/AsmRoutines.h and produce the same results as the x86-64 assembly
-// versions for the common paths.
+// Used on architectures that do not have an assembly implementation. The
+// functions below match the contract in Engine/AsmRoutines.h and produce
+// the same results as the x86-64 assembly versions for the common paths.
 // ==========================================================================
 #include "AsmRoutines.h"
 

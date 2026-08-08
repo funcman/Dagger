@@ -19,10 +19,24 @@ Screen::Screen(int width, int height, char const* title)
         return;
     }
 
-    renderer_ = SDL_CreateRenderer(window_, 0);
+    // macOS: use the OpenGL backend. The Metal renderer (and SDL's software
+    // fallback) synchronize SDL_RenderPresent to the display refresh rate on
+    // this platform even with VSync disabled, capping windowed apps at ~120 Hz.
+    // OpenGL with VSync off can present uncapped, giving the same throughput
+    // as on Windows.
+#if defined(__APPLE__)
+    renderer_ = SDL_CreateRenderer(window_, "opengl");
+#else
+    renderer_ = SDL_CreateRenderer(window_, nullptr);
+#endif
     if (!renderer_) {
         DDebugLog("SDL_CreateRenderer failed: %s", SDL_GetError());
         return;
+    }
+
+    // Disable VSync for uncapped frame rate.
+    if (!SDL_SetRenderVSync(renderer_, SDL_RENDERER_VSYNC_DISABLED)) {
+        DDebugLog("SDL_SetRenderVSync failed: %s", SDL_GetError());
     }
 
     // Upload the engine's 16-bit frame buffer as-is; SDL converts 16->32 while rendering
