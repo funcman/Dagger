@@ -12,12 +12,10 @@ struct SDL_Texture;
 // SDL3 frontend: window + renderer + RGB565 streaming texture.
 // The engine core works in 16-bit color and writes directly into the
 // 16-bit frame buffer exposed by frameBuffer(); present() uploads it as
-// an RGB565 texture and SDL performs the 16->32 conversion while
-// rendering (same approach as the Qt era: QImage::Format_RGB16 +
-// drawImage).
+// an RGB565 texture and SDL performs the 16->32 conversion while rendering.
 class Screen {
-   public:
-    Screen(int width, int height);
+public:
+    Screen(int width, int height, char const* tilte);
     ~Screen();
 
     bool ok() const;
@@ -31,7 +29,8 @@ class Screen {
     int width() const { return width_; }
     int height() const { return height_; }
 
-   private:
+private:
+    char const* title_;
     int width_;
     int height_;
 

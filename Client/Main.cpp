@@ -10,7 +10,7 @@ int main(int argc, char** argv) {
 
     std::unique_ptr<DMemPool> pool(new DMemPool());
 
-    Screen screen(640, 480);
+    Screen screen(640, 480, "Dagger Engine");
     if (!screen.ok()) {
         return 1;
     }

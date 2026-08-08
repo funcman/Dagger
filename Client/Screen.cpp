@@ -4,8 +4,8 @@
 
 #include "Debug.h"
 
-Screen::Screen(int width, int height)
-    : width_(width), height_(height), window_(0), renderer_(0), texture_(0) {
+Screen::Screen(int width, int height, char const* title)
+    : width_(width), height_(height), title_(title), window_(0), renderer_(0), texture_(0) {
     pixels_.resize((size_t)width_ * height_, 0);
 
     if (!SDL_Init(SDL_INIT_VIDEO)) {
@@ -13,7 +13,7 @@ Screen::Screen(int width, int height)
         return;
     }
 
-    window_ = SDL_CreateWindow("Dagger", width_, height_, 0);
+    window_ = SDL_CreateWindow(title_, width_, height_, 0);
     if (!window_) {
         DDebugLog("SDL_CreateWindow failed: %s", SDL_GetError());
         return;
@@ -78,8 +78,8 @@ void Screen::present() {
     uint64_t elapsed = now - fpsStart_;
     if (elapsed >= 1000) {
         char title[64];
-        SDL_snprintf(title, sizeof(title), "Dagger - FPS: %u",
-                     (unsigned)(fpsFrames_ * 1000 / elapsed));
+        SDL_snprintf(title, sizeof(title), "%s - FPS: %u",
+                     title_, (unsigned)(fpsFrames_ * 1000 / elapsed));
         SDL_SetWindowTitle(window_, title);
         fpsFrames_ = 0;
         fpsStart_ = now;
