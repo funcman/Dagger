@@ -32,6 +32,8 @@ Screen::Screen(int width, int height)
         DDebugLog("SDL_CreateTexture failed: %s", SDL_GetError());
         return;
     }
+
+    fpsStart_ = SDL_GetTicks();
 }
 
 Screen::~Screen() {
@@ -69,6 +71,19 @@ void Screen::present() {
     SDL_RenderClear(renderer_);
     SDL_RenderTexture(renderer_, texture_, 0, 0);
     SDL_RenderPresent(renderer_);
+
+    // Refresh the FPS counter in the window title once per second
+    ++fpsFrames_;
+    uint64_t now = SDL_GetTicks();
+    uint64_t elapsed = now - fpsStart_;
+    if (elapsed >= 1000) {
+        char title[64];
+        SDL_snprintf(title, sizeof(title), "Dagger - FPS: %u",
+                     (unsigned)(fpsFrames_ * 1000 / elapsed));
+        SDL_SetWindowTitle(window_, title);
+        fpsFrames_ = 0;
+        fpsStart_ = now;
+    }
 }
 
 void* Screen::frameBuffer() {

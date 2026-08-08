@@ -40,6 +40,9 @@ class Screen {
     SDL_Texture* texture_;
 
     std::vector<uint16_t> pixels_;  // 16-bit frame buffer, RGB565
+
+    uint64_t fpsStart_ = 0;
+    unsigned fpsFrames_ = 0;
 };
 
 #endif//DAGGER_SCREEN_H
