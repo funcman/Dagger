@@ -1,50 +1,52 @@
-#ifndef MEMPOOL_H
-#define MEMPOOL_H
+#ifndef DAGGER_MEMPOOL_H
+#define DAGGER_MEMPOOL_H
 
 #include <list>
 
-#define DCalloc(s)  GpMemPool->alloc((s), _FILE_, _LINE_)
-#define DFree(m)    GpMemPool->free((m), _FILE_, _LINE_)
+#include "TypeDef.h"
 
-const int MIN_BLOCK     = 4;                        // min block size is 2^4
-const int MAX_BLOCK     = 10;                       // max block size is 2^10
-const int NUM_BLOCK     = ((MAX_BLOCK-MIN_BLOCK)+1);
-const int CHUNK_SIZE    = 16 * 1024;                // chunk size is 16kb
+#define DCAlloc(s) GpMemPool->Alloc((s), __FILE__, __LINE__)
+#define DFree(m) GpMemPool->Free((m), __FILE__, __LINE__)
 
-class MemPool {
-public:
-    MemPool();
-    ~MemPool();
+const int MIN_BLOCK = 4;   // min block size is 2^4
+const int MAX_BLOCK = 10;  // max block size is 2^10
+const int NUM_BLOCK = ((MAX_BLOCK - MIN_BLOCK) + 1);
+const int CHUNK_SIZE = 16 * 1024;  // chunk size is 16kb
 
-    void*   alloc(long size, char const* file, int line);
-    void    free(void* mem, char const* file, int line);
-    long    size();
-    void    freeAll();
+class DMemPool {
+   public:
+    DMemPool();
+    ~DMemPool();
 
-private:
+    void* Alloc(long size, char const* file, int line);
+    void Free(void* mem, char const* file, int line);
+    long size();
+    void FreeAll();
+
+   private:
     struct ChunkHeader_ {
-        long        blockNum;
-        long        blockSize;
+        long blockNum;
+        long blockSize;
         std::list<struct ChunkHeader_*>::iterator itr;
     };
 
     struct BlockHeader_ {
-        void*       data;
-        void*       next;
-        long        size;
+        void* data;
+        void* next;
+        long size;
         char const* file;
-        int         line;
+        int line;
     };
 
-    std::list<struct ChunkHeader_*>  chunks_;
-    void*                       blocks_[NUM_BLOCK];
-    long                        blockSizes_[NUM_BLOCK];
+    std::list<struct ChunkHeader_*> chunks_;
+    void* blocks_[NUM_BLOCK];
+    long blockSizes_[NUM_BLOCK];
 
-    void*   allocChunk_(long blockSize, int blockNum);
-    void    freeChunk_(struct ChunkHeader_* ch);
-    void    freeChunkList_();
+    void* AllocChunk_(long blockSize, int blockNum);
+    void FreeChunk_(struct ChunkHeader_* ch);
+    void FreeChunkList_();
 };
 
-extern MemPool* GpMemPool;
+extern DAGGER_API DMemPool* GpMemPool;
 
-#endif//MEMPOOL_H
+#endif//DAGGER_MEMPOOL_H

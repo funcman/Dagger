@@ -1,10 +1,10 @@
-#ifndef ENGINE_H
-#define ENGINE_H
+#ifndef DAGGER_ENGINE_H
+#define DAGGER_ENGINE_H
 
-#include "Macros.h"
-#include "Color.h"
-#include "DrawPixel.h"
-#include "DrawLine.h"
 #include "Canvas.h"
+#include "Color.h"
+#include "DrawLine.h"
+#include "DrawPixel.h"
+#include "Macros.h"
 
-#endif//ENGINE_H
+#endif//DAGGER_ENGINE_H

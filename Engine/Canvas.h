@@ -1,39 +1,39 @@
-#ifndef CANVAS_H
-#define CANVAS_H
+#ifndef DAGGER_CANVAS_H
+#define DAGGER_CANVAS_H
 
 typedef struct {
-    long    left;
-    long    top;
-    long    right;
-    long    bottom;
+    long left;
+    long top;
+    long right;
+    long bottom;
 } Rect;
 
 typedef struct {
-    long    x;
-    long    y;
-    long    width;
-    long    height;
-    long    left;
-    long    top;
-    long    right;
-    long    bottom;
+    long x;
+    long y;
+    long width;
+    long height;
+    long left;
+    long top;
+    long right;
+    long bottom;
 } Clipper;
 
-class Canvas {
-public:
-    void*       frameBuffer;
-    long        width;
-    long        height;
-    long        pitch;
-    Rect        rect;
+class DCanvas {
+   public:
+    void* frameBuffer;
+    long width;
+    long height;
+    long pitch;
+    Rect rect;
 
-public:
-    Canvas(int w, int h, void* scr);
-    ~Canvas();
+   public:
+    DCanvas(int w, int h, void* scr);
+    ~DCanvas();
 
-    bool    makeClipper(Clipper* clipperPtr);
+    bool makeClipper(Clipper* clipperPtr);
 };
 
-extern Canvas* GpCanvas;
+extern DCanvas* GpCanvas;
 
-#endif//CANVAS_H
+#endif//DAGGER_CANVAS_H

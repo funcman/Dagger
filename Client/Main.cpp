@@ -1,24 +1,38 @@
 #include <memory>
-#include <QApplication>
-#include <QTimer>
-
-#include "MainWindow.h"
-#include "MainTask.h"
 
 #include "Base.h"
+#include "Engine.h"
+#include "Screen.h"
 
 int main(int argc, char** argv) {
-    QApplication a(argc, argv);
+    (void)argc;
+    (void)argv;
 
-    std::auto_ptr<MemPool>           pool_(new MemPool());
+    std::unique_ptr<DMemPool> pool(new DMemPool());
 
-    MainWindow w;
-    w.show();
+    Screen screen(640, 480);
+    if (!screen.ok()) {
+        return 1;
+    }
 
-    MainTask task(&a);
-    QObject::connect(&a, SIGNAL(lastWindowClosed()), &task, SLOT(quit()));
-    QObject::connect(&task, SIGNAL(finished()), &a, SLOT(quit()));
-    QTimer::singleShot(0, &task, SLOT(run()));
+    // The engine draws directly into the frontend's 16-bit frame buffer
+    DCanvas canvas(screen.width(), screen.height(), screen.frameBuffer());
 
-    return a.exec();
+    while (screen.pollEvents()) {
+        for (int l = 0; l < 32; ++l) {
+            for (int i = 0; i < 100; ++i) {
+                DrawPixelFast(i, l, RGB565(255, 0, 255));
+            }
+            for (int i = 0; i < 100; ++i) {
+                DrawPixelAlpha(i, l, RGB565(0, 255, 0), l);
+            }
+        }
+
+        DrawLine(0, 0, 300, 300, RGB565(0, 255, 0));
+        DrawLineAlpha(200, 200, 400, 400, RGB565(255, 0, 0), 16);
+
+        screen.present();
+    }
+
+    return 0;
 }

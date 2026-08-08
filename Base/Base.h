@@ -1,7 +1,9 @@
-#ifndef BASE_H
-#define BASE_H
+#ifndef DAGGER_BASE_H
+#define DAGGER_BASE_H
 
-#include "Types.h"
+#include "Debug.h"
 #include "MemPool.h"
+#include "Memory.h"
+#include "TypeDef.h"
 
-#endif//BASE_H
+#endif//DAGGER_BASE_H
