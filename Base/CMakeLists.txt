@@ -2,6 +2,8 @@ add_library(DBase SHARED
     Debug.cpp
     Memory.cpp
     MemPool.cpp
+    Node.cpp
+    List.cpp
 )
 
 # Auto-export all symbols on Windows; no need for __declspec(dllexport)
