@@ -5,11 +5,11 @@
 #include "Memory.h"
 #include "TypeDef.h"
 
-void DDrawBmp(int nX, int nY, int nWidth, int nHeight, void* pBitmap, void* pPalette);
-void DDrawBmpTrans(int nX, int nY, int nWidth, int nHeight, void* pBitmap, void* pPalette);
-void DDrawBmp16(int nX, int nY, int nWidth, int nHeight, void* pBitmap);
-void DDrawBmp16Mmx(int nX, int nY, int nWidth, int nHeight, void* pBitmap);
-void DDrawBmp16Rev(int nX, int nY, int nWidth, int nHeight, void* pBitmap);
+void DDrawBitmap(int nX, int nY, int nWidth, int nHeight, void* pBitmap, void* pPalette);
+void DDrawBitmapTrans(int nX, int nY, int nWidth, int nHeight, void* pBitmap, void* pPalette);
+void DDrawBitmap16(int nX, int nY, int nWidth, int nHeight, void* pBitmap);
+void DDrawBitmap16Mmx(int nX, int nY, int nWidth, int nHeight, void* pBitmap);
+void DDrawBitmap16Rev(int nX, int nY, int nWidth, int nHeight, void* pBitmap);
 
 class DBitmap {
    public:

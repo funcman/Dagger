@@ -16,15 +16,15 @@ DCanvas::DCanvas(int w, int h, void* scr) {
     rect.right = width - 1;
     rect.bottom = height - 1;
 
-    GpRGB = RGB565;
-    GpHigh2True = High2True565;
+    GpRGB = DRGB565;
+    GpHigh2True = DHigh2True565;
 }
 
 DCanvas::~DCanvas() {
     GpCanvas = 0;
 }
 
-bool DCanvas::makeClipper(Clipper* clipperPtr) {
+bool DCanvas::makeClipper(DClipper* clipperPtr) {
     int xx = clipperPtr->x;
     int yy = clipperPtr->y;
     clipperPtr->top = 0;

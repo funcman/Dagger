@@ -6,7 +6,7 @@ typedef struct {
     long top;
     long right;
     long bottom;
-} Rect;
+} DRect;
 
 typedef struct {
     long x;
@@ -17,7 +17,7 @@ typedef struct {
     long top;
     long right;
     long bottom;
-} Clipper;
+} DClipper;
 
 class DCanvas {
    public:
@@ -25,13 +25,13 @@ class DCanvas {
     long width;
     long height;
     long pitch;
-    Rect rect;
+    DRect rect;
 
    public:
     DCanvas(int w, int h, void* scr);
     ~DCanvas();
 
-    bool makeClipper(Clipper* clipperPtr);
+    bool makeClipper(DClipper* clipperPtr);
 };
 
 extern DCanvas* GpCanvas;

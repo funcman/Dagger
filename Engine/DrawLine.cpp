@@ -2,7 +2,7 @@
 #include "Macros.h"
 #include "DrawPixel.h"
 
-void DrawLine(int x1, int y1, int x2, int y2, int color) {
+void DDrawLine(int x1, int y1, int x2, int y2, int color) {
     long d, x, y, ax, ay, sx, sy, dx, dy;
 
     dx = x2 - x1;
@@ -19,7 +19,7 @@ void DrawLine(int x1, int y1, int x2, int y2, int color) {
     if (ax > ay) {
         d = ay - (ax >> 1);
         while (x != x2) {
-            DrawPixel(x, y, color);
+            DDrawPixel(x, y, color);
             if (d >= 0) {
                 y += sy;
                 d -= ax;
@@ -30,7 +30,7 @@ void DrawLine(int x1, int y1, int x2, int y2, int color) {
     }else {
         d = ax - (ay >> 1);
         while (y != y2) {
-            DrawPixel(x, y, color);
+            DDrawPixel(x, y, color);
             if (d >= 0) {
                 x += sx;
                 d -= ay;
@@ -39,10 +39,10 @@ void DrawLine(int x1, int y1, int x2, int y2, int color) {
             d += ax;
         }
     }
-    DrawPixel(x, y, color);
+    DDrawPixel(x, y, color);
 }
 
-void DrawLineAlpha(int x1, int y1, int x2, int y2, int color, int alpha) {
+void DDrawLineAlpha(int x1, int y1, int x2, int y2, int color, int alpha) {
     long d, x, y, ax, ay, sx, sy, dx, dy;
 
     dx = x2 - x1;
@@ -59,7 +59,7 @@ void DrawLineAlpha(int x1, int y1, int x2, int y2, int color, int alpha) {
     if (ax > ay) {
         d = ay - (ax >> 1);
         while (x != x2) {
-            DrawPixelAlpha(x, y, color, alpha);
+            DDrawPixelAlpha(x, y, color, alpha);
             if (d >= 0) {
                 y += sy;
                 d -= ax;
@@ -70,7 +70,7 @@ void DrawLineAlpha(int x1, int y1, int x2, int y2, int color, int alpha) {
     }else {
         d = ax - (ay >> 1);
         while (y != y2) {
-            DrawPixelAlpha(x, y, color, alpha);
+            DDrawPixelAlpha(x, y, color, alpha);
             if (d >= 0) {
                 x += sx;
                 d -= ay;
@@ -79,5 +79,5 @@ void DrawLineAlpha(int x1, int y1, int x2, int y2, int color, int alpha) {
             d += ax;
         }
     }
-    DrawPixelAlpha(x, y, color, alpha);
+    DDrawPixelAlpha(x, y, color, alpha);
 }

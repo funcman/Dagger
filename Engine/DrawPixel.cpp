@@ -8,27 +8,27 @@
 // (one for MSVC, one for GCC/Clang); only clipping checks and argument
 // forwarding remain here.
 
-void DrawPixel(int x, int y, int color) {
+void DDrawPixel(int x, int y, int color) {
     if (y < GpCanvas->rect.top || y >= GpCanvas->rect.bottom ||
         x < GpCanvas->rect.left || x >= GpCanvas->rect.right) {
         return;
     }
 
-    AsmPixelArgs args = {GpCanvas->frameBuffer, (int)GpCanvas->pitch, x, y, color, 0};
-    AsmDrawPixel16(&args);
+    DPixelArgs args = {GpCanvas->frameBuffer, (int)GpCanvas->pitch, x, y, color, 0};
+    DDrawPixel16Core(&args);
 }
 
-void DrawPixelFast(int x, int y, int color) {
-    AsmPixelArgs args = {GpCanvas->frameBuffer, (int)GpCanvas->pitch, x, y, color, 0};
-    AsmDrawPixel16(&args);
+void DDrawPixelFast(int x, int y, int color) {
+    DPixelArgs args = {GpCanvas->frameBuffer, (int)GpCanvas->pitch, x, y, color, 0};
+    DDrawPixel16Core(&args);
 }
 
-void DrawPixelAlpha(int x, int y, int color, int alpha) {
+void DDrawPixelAlpha(int x, int y, int color, int alpha) {
     if (y < GpCanvas->rect.top || y >= GpCanvas->rect.bottom ||
         x < GpCanvas->rect.left || x >= GpCanvas->rect.right) {
         return;
     }
 
-    AsmPixelArgs args = {GpCanvas->frameBuffer, (int)GpCanvas->pitch, x, y, color, alpha};
-    AsmDrawPixelAlpha16(&args);
+    DPixelArgs args = {GpCanvas->frameBuffer, (int)GpCanvas->pitch, x, y, color, alpha};
+    DDrawPixelAlpha16Core(&args);
 }

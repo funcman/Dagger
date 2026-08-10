@@ -1,5 +1,5 @@
 // ==========================================================================
-// Engine64_gnu.S - Engine pixel/color routines, x86-64, GCC/Clang (GAS)
+// Engine64_gnu.S - Engine pixel/color/bitmap routines, x86-64, GCC/Clang (GAS)
 // MSVC (ml64) version: Engine64_msvc.asm; see Engine/AsmRoutines.h for
 // the argument contract.
 // Linux/macOS use the System V ABI; MinGW/clang-gnu use the MS ABI under
@@ -28,19 +28,24 @@
 // (.type 32); otherwise they are exported as data, callers get 32-bit
 // pseudo-relocations, and the process crashes at runtime when ASLR loads
 // the DLL above the 4GB mark.
-    .def AsmDrawPixel16;      .scl 2; .type 32; .endef
-    .def AsmDrawPixelAlpha16; .scl 2; .type 32; .endef
-    .def AsmRGB555;           .scl 2; .type 32; .endef
-    .def AsmRGB565;           .scl 2; .type 32; .endef
-    .def AsmRGB555To565;      .scl 2; .type 32; .endef
-    .def AsmRGB565To555;      .scl 2; .type 32; .endef
+    .def DDrawPixel16Core;      .scl 2; .type 32; .endef
+    .def DDrawPixelAlpha16Core; .scl 2; .type 32; .endef
+    .def DRGB555Core;           .scl 2; .type 32; .endef
+    .def DRGB565Core;           .scl 2; .type 32; .endef
+    .def DRGB555To565Core;      .scl 2; .type 32; .endef
+    .def DRGB565To555Core;      .scl 2; .type 32; .endef
+    .def DDrawBitmapCore;       .scl 2; .type 32; .endef
+    .def DDrawBitmapTransCore;  .scl 2; .type 32; .endef
+    .def DDrawBitmap16Core;     .scl 2; .type 32; .endef
+    .def DDrawBitmap16MmxCore;  .scl 2; .type 32; .endef
+    .def DDrawBitmap16RevCore;  .scl 2; .type 32; .endef
 #endif
 
 // --------------------------------------------------------------------------
-// void AsmDrawPixel16(const AsmPixelArgs* args)
+// void DDrawPixel16Core(const DPixelArgs* args)
 // --------------------------------------------------------------------------
-    .globl AsmDrawPixel16
-AsmDrawPixel16:
+    .globl DDrawPixel16Core
+DDrawPixel16Core:
     mov     eax, dword ptr [APTR+16]    // y
     mul     dword ptr [APTR+8]          // y * pitch
     mov     r10d, dword ptr [APTR+12]   // x
@@ -53,11 +58,11 @@ AsmDrawPixel16:
     ret
 
 // --------------------------------------------------------------------------
-// void AsmDrawPixelAlpha16(const AsmPixelArgs* args)
+// void DDrawPixelAlpha16Core(const DPixelArgs* args)
 // blended = (src*alpha + dst*(32-alpha)) / 32, mixed via 0x07e0f81f dual-word expansion
 // --------------------------------------------------------------------------
-    .globl AsmDrawPixelAlpha16
-AsmDrawPixelAlpha16:
+    .globl DDrawPixelAlpha16Core
+DDrawPixelAlpha16Core:
     mov     eax, dword ptr [APTR+16]    // y
     mul     dword ptr [APTR+8]          // y * pitch
     mov     r10d, dword ptr [APTR+12]   // x
@@ -94,10 +99,10 @@ AsmDrawPixelAlpha16:
     ret
 
 // --------------------------------------------------------------------------
-// unsigned short AsmRGB555(int r, int g, int b)
+// unsigned short DRGB555Core(int red, int green, int blue)
 // --------------------------------------------------------------------------
-    .globl AsmRGB555
-AsmRGB555:
+    .globl DRGB555Core
+DRGB555Core:
     mov     eax, ARG1d
     and     eax, 0xff
     shr     eax, 3
@@ -112,10 +117,10 @@ AsmRGB555:
     ret                                 // result in ax
 
 // --------------------------------------------------------------------------
-// unsigned short AsmRGB565(int r, int g, int b)
+// unsigned short DRGB565Core(int red, int green, int blue)
 // --------------------------------------------------------------------------
-    .globl AsmRGB565
-AsmRGB565:
+    .globl DRGB565Core
+DRGB565Core:
     mov     eax, ARG1d
     and     eax, 0xff
     shr     eax, 3
@@ -130,10 +135,10 @@ AsmRGB565:
     ret                                 // result in ax
 
 // --------------------------------------------------------------------------
-// void AsmRGB555To565(int w, int h, void* bm_ptr)
+// void DRGB555To565Core(int width, int height, void* bmPtr)
 // --------------------------------------------------------------------------
-    .globl AsmRGB555To565
-AsmRGB555To565:
+    .globl DRGB555To565Core
+DRGB555To565Core:
     mov     r9d, ARG2d                  // row counter
 .Lrow_555to565:
     mov     r10d, ARG1d                 // column counter
@@ -153,10 +158,10 @@ AsmRGB555To565:
     ret
 
 // --------------------------------------------------------------------------
-// void AsmRGB565To555(int w, int h, void* bm_ptr)
+// void DRGB565To555Core(int width, int height, void* bmPtr)
 // --------------------------------------------------------------------------
-    .globl AsmRGB565To555
-AsmRGB565To555:
+    .globl DRGB565To555Core
+DRGB565To555Core:
     mov     r9d, ARG2d                  // row counter
 .Lrow_565to555:
     mov     r10d, ARG1d                 // column counter
@@ -173,6 +178,345 @@ AsmRGB565To555:
     jnz     .Lcol_565to555
     dec     r9d
     jnz     .Lrow_565to555
+    ret
+
+// --------------------------------------------------------------------------
+// void DDrawBitmapCore(const DBitmapArgs* args)
+// 8bpp -> 16bpp blit through the palette.
+//   rdi = dst, rsi = src, rbx = palette
+//   r12d = width, r13d = height, r10 = canvasOffs, r11 = bitmapOffs
+// --------------------------------------------------------------------------
+    .globl DDrawBitmapCore
+DDrawBitmapCore:
+    push    rbx
+    push    rsi
+    push    rdi
+    push    r12
+    push    r13
+    mov     r9, APTR                    // args
+
+    // dst = frameBuffer + y*pitch + 2*x
+    mov     eax, dword ptr [r9+16]      // y
+    mul     dword ptr [r9+8]            // y * pitch
+    mov     r10d, dword ptr [r9+12]     // x
+    add     eax, r10d
+    add     eax, r10d
+    mov     rdi, qword ptr [r9]         // frameBuffer
+    add     rdi, rax
+
+    // src = bitmap + srcY*bmpWidth + srcX  (8-bit indices)
+    mov     eax, dword ptr [r9+40]      // srcY
+    mul     dword ptr [r9+28]           // srcY * bmpWidth
+    add     eax, dword ptr [r9+36]      // + srcX
+    mov     rsi, qword ptr [r9+48]      // bitmap
+    add     rsi, rax
+
+    mov     rbx, qword ptr [r9+56]      // palette
+    mov     r12d, dword ptr [r9+20]     // width
+    mov     r13d, dword ptr [r9+24]     // height
+
+    mov     r10d, dword ptr [r9+8]      // pitch
+    mov     eax, r12d
+    add     eax, eax
+    sub     r10d, eax                   // canvasOffs = pitch - width*2
+    mov     r11d, dword ptr [r9+28]
+    sub     r11d, r12d                  // bitmapOffs = bmpWidth - width
+
+.Lrow_drawbitmap:
+    mov     ecx, r12d
+.Lcol_drawbitmap:
+    movzx   edx, byte ptr [rsi]
+    inc     rsi
+    mov     ax, word ptr [rbx + rdx*2]
+    mov     word ptr [rdi], ax
+    add     rdi, 2
+    dec     ecx
+    jnz     .Lcol_drawbitmap
+    add     rdi, r10
+    add     rsi, r11
+    dec     r13d
+    jnz     .Lrow_drawbitmap
+
+    pop     r13
+    pop     r12
+    pop     rdi
+    pop     rsi
+    pop     rbx
+    ret
+
+// --------------------------------------------------------------------------
+// void DDrawBitmapTransCore(const DBitmapArgs* args)
+// 8bpp -> 16bpp blit, 50% blend with the canvas via 0x07e0f81f
+// dual-word expansion: blended = (src + dst) / 2 per channel.
+// Same register layout as DDrawBitmapCore.
+// --------------------------------------------------------------------------
+    .globl DDrawBitmapTransCore
+DDrawBitmapTransCore:
+    push    rbx
+    push    rsi
+    push    rdi
+    push    r12
+    push    r13
+    mov     r9, APTR                    // args
+
+    // dst = frameBuffer + y*pitch + 2*x
+    mov     eax, dword ptr [r9+16]      // y
+    mul     dword ptr [r9+8]            // y * pitch
+    mov     r10d, dword ptr [r9+12]     // x
+    add     eax, r10d
+    add     eax, r10d
+    mov     rdi, qword ptr [r9]         // frameBuffer
+    add     rdi, rax
+
+    // src = bitmap + srcY*bmpWidth + srcX  (8-bit indices)
+    mov     eax, dword ptr [r9+40]      // srcY
+    mul     dword ptr [r9+28]           // srcY * bmpWidth
+    add     eax, dword ptr [r9+36]      // + srcX
+    mov     rsi, qword ptr [r9+48]      // bitmap
+    add     rsi, rax
+
+    mov     rbx, qword ptr [r9+56]      // palette
+    mov     r12d, dword ptr [r9+20]     // width
+    mov     r13d, dword ptr [r9+24]     // height
+
+    mov     r10d, dword ptr [r9+8]      // pitch
+    mov     eax, r12d
+    add     eax, eax
+    sub     r10d, eax                   // canvasOffs = pitch - width*2
+    mov     r11d, dword ptr [r9+28]
+    sub     r11d, r12d                  // bitmapOffs = bmpWidth - width
+
+.Lrow_drawbitmaptrans:
+    mov     ecx, r12d
+.Lcol_drawbitmaptrans:
+    movzx   eax, byte ptr [rsi]
+    inc     rsi
+    movzx   edx, word ptr [rbx + rax*2] // src color
+    mov     eax, edx
+    shl     eax, 16
+    mov     ax, dx
+    and     eax, 0x07e0f81f             // src expanded: g high, r|b low
+    movzx   edx, word ptr [rdi]         // dst color
+    mov     r8d, edx
+    shl     r8d, 16
+    mov     r8w, dx
+    and     r8d, 0x07e0f81f             // dst expanded
+    add     eax, r8d
+    shr     eax, 1
+    and     eax, 0x07e0f81f
+    mov     dx, ax
+    shr     eax, 16
+    or      ax, dx
+    mov     word ptr [rdi], ax
+    add     rdi, 2
+    dec     ecx
+    jnz     .Lcol_drawbitmaptrans
+    add     rdi, r10
+    add     rsi, r11
+    dec     r13d
+    jnz     .Lrow_drawbitmaptrans
+
+    pop     r13
+    pop     r12
+    pop     rdi
+    pop     rsi
+    pop     rbx
+    ret
+
+// --------------------------------------------------------------------------
+// void DDrawBitmap16Core(const DBitmapArgs* args)
+// 16bpp copy.
+//   rdi = dst, rsi = src
+//   r12d = width, r13d = height, r10 = canvasOffs, r11 = bitmapOffs
+// --------------------------------------------------------------------------
+    .globl DDrawBitmap16Core
+DDrawBitmap16Core:
+    push    rsi
+    push    rdi
+    push    r12
+    push    r13
+    mov     r9, APTR                    // args
+
+    // dst = frameBuffer + y*pitch + 2*x
+    mov     eax, dword ptr [r9+16]      // y
+    mul     dword ptr [r9+8]            // y * pitch
+    mov     r10d, dword ptr [r9+12]     // x
+    add     eax, r10d
+    add     eax, r10d
+    mov     rdi, qword ptr [r9]         // frameBuffer
+    add     rdi, rax
+
+    // src = bitmap + (srcY*bmpWidth + srcX) * 2
+    mov     eax, dword ptr [r9+40]      // srcY
+    mul     dword ptr [r9+28]           // srcY * bmpWidth
+    add     eax, dword ptr [r9+36]      // + srcX
+    add     eax, eax                    // 16-bit pixels
+    mov     rsi, qword ptr [r9+48]      // bitmap
+    add     rsi, rax
+
+    mov     r12d, dword ptr [r9+20]     // width
+    mov     r13d, dword ptr [r9+24]     // height
+
+    mov     r10d, dword ptr [r9+8]      // pitch
+    mov     eax, r12d
+    add     eax, eax
+    sub     r10d, eax                   // canvasOffs = pitch - width*2
+    mov     r11d, dword ptr [r9+28]
+    sub     r11d, r12d
+    add     r11d, r11d                  // bitmapOffs = (bmpWidth - width) * 2
+
+.Lrow_drawbitmap16:
+    mov     ecx, r12d
+    rep movsw
+    add     rdi, r10
+    add     rsi, r11
+    dec     r13d
+    jnz     .Lrow_drawbitmap16
+
+    pop     r13
+    pop     r12
+    pop     rdi
+    pop     rsi
+    ret
+
+// --------------------------------------------------------------------------
+// void DDrawBitmap16MmxCore(const DBitmapArgs* args)
+// 16bpp copy, 8 bytes per movq with a word tail.
+// Same register layout as DDrawBitmap16Core.
+// --------------------------------------------------------------------------
+    .globl DDrawBitmap16MmxCore
+DDrawBitmap16MmxCore:
+    push    rsi
+    push    rdi
+    push    r12
+    push    r13
+    mov     r9, APTR                    // args
+
+    // dst = frameBuffer + y*pitch + 2*x
+    mov     eax, dword ptr [r9+16]      // y
+    mul     dword ptr [r9+8]            // y * pitch
+    mov     r10d, dword ptr [r9+12]     // x
+    add     eax, r10d
+    add     eax, r10d
+    mov     rdi, qword ptr [r9]         // frameBuffer
+    add     rdi, rax
+
+    // src = bitmap + (srcY*bmpWidth + srcX) * 2
+    mov     eax, dword ptr [r9+40]      // srcY
+    mul     dword ptr [r9+28]           // srcY * bmpWidth
+    add     eax, dword ptr [r9+36]      // + srcX
+    add     eax, eax                    // 16-bit pixels
+    mov     rsi, qword ptr [r9+48]      // bitmap
+    add     rsi, rax
+
+    mov     r12d, dword ptr [r9+20]     // width
+    mov     r13d, dword ptr [r9+24]     // height
+
+    mov     r10d, dword ptr [r9+8]      // pitch
+    mov     eax, r12d
+    add     eax, eax
+    sub     r10d, eax                   // canvasOffs = pitch - width*2
+    mov     r11d, dword ptr [r9+28]
+    sub     r11d, r12d
+    add     r11d, r11d                  // bitmapOffs = (bmpWidth - width) * 2
+
+.Lrow_drawbitmap16mmx:
+    mov     ecx, r12d
+    shr     ecx, 2                      // 4 pixels per movq
+    jz      .Ltail_drawbitmap16mmx
+.Lquad_drawbitmap16mmx:
+    movq    mm0, qword ptr [rsi]
+    movq    qword ptr [rdi], mm0
+    add     rsi, 8
+    add     rdi, 8
+    dec     ecx
+    jnz     .Lquad_drawbitmap16mmx
+.Ltail_drawbitmap16mmx:
+    mov     ecx, r12d
+    and     ecx, 3
+    rep movsw
+    add     rsi, r11
+    add     rdi, r10
+    dec     r13d
+    jnz     .Lrow_drawbitmap16mmx
+    emms
+
+    pop     r13
+    pop     r12
+    pop     rdi
+    pop     rsi
+    ret
+
+// --------------------------------------------------------------------------
+// void DDrawBitmap16RevCore(const DBitmapArgs* args)
+// 16bpp copy, vertically flipped: the first canvas row reads the
+// bitmap's last row.
+// Same register layout as DDrawBitmap16Core; r11 = bytes to step the
+// source back per row.
+// --------------------------------------------------------------------------
+    .globl DDrawBitmap16RevCore
+DDrawBitmap16RevCore:
+    push    rsi
+    push    rdi
+    push    r12
+    push    r13
+    mov     r9, APTR                    // args
+
+    // dst = frameBuffer + y*pitch + 2*x
+    mov     eax, dword ptr [r9+16]      // y
+    mul     dword ptr [r9+8]            // y * pitch
+    mov     r10d, dword ptr [r9+12]     // x
+    add     eax, r10d
+    add     eax, r10d
+    mov     rdi, qword ptr [r9]         // frameBuffer
+    add     rdi, rax
+
+    // src = bitmap + ((bmpHeight-1-srcY)*bmpWidth + srcX) * 2
+    mov     eax, dword ptr [r9+32]      // bmpHeight
+    dec     eax
+    sub     eax, dword ptr [r9+40]      // bmpHeight - 1 - srcY
+    mul     dword ptr [r9+28]           // * bmpWidth
+    add     eax, dword ptr [r9+36]      // + srcX
+    add     eax, eax                    // 16-bit pixels
+    mov     rsi, qword ptr [r9+48]      // bitmap
+    add     rsi, rax
+
+    mov     r12d, dword ptr [r9+20]     // width
+    mov     r13d, dword ptr [r9+24]     // height
+
+    mov     r10d, dword ptr [r9+8]      // pitch
+    mov     eax, r12d
+    add     eax, eax
+    sub     r10d, eax                   // canvasOffs = pitch - width*2
+    mov     r11d, dword ptr [r9+28]
+    add     r11d, r12d
+    add     r11d, r11d                  // rowBack = (bmpWidth + width) * 2
+
+.Lrow_drawbitmap16rev:
+    mov     ecx, r12d
+    shr     ecx, 2                      // 4 pixels per movq
+    jz      .Ltail_drawbitmap16rev
+.Lquad_drawbitmap16rev:
+    movq    mm0, qword ptr [rsi]
+    movq    qword ptr [rdi], mm0
+    add     rsi, 8
+    add     rdi, 8
+    dec     ecx
+    jnz     .Lquad_drawbitmap16rev
+.Ltail_drawbitmap16rev:
+    mov     ecx, r12d
+    and     ecx, 3
+    rep movsw
+    sub     rsi, r11
+    add     rdi, r10
+    dec     r13d
+    jnz     .Lrow_drawbitmap16rev
+    emms
+
+    pop     r13
+    pop     r12
+    pop     rdi
+    pop     rsi
     ret
 
 #if !defined(_WIN64)

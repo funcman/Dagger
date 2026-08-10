@@ -21,15 +21,15 @@ int main(int argc, char** argv) {
     while (screen.pollEvents()) {
         for (int l = 0; l < 32; ++l) {
             for (int i = 0; i < 100; ++i) {
-                DrawPixelFast(i, l, RGB565(255, 0, 255));
+                DDrawPixelFast(i, l, DRGB565(255, 0, 255));
             }
             for (int i = 0; i < 100; ++i) {
-                DrawPixelAlpha(i, l, RGB565(0, 255, 0), l);
+                DDrawPixelAlpha(i, l, DRGB565(0, 255, 0), l);
             }
         }
 
-        DrawLine(0, 0, 300, 300, RGB565(0, 255, 0));
-        DrawLineAlpha(200, 200, 400, 400, RGB565(255, 0, 0), 16);
+        DDrawLine(0, 0, 300, 300, DRGB565(0, 255, 0));
+        DDrawLineAlpha(200, 200, 400, 400, DRGB565(255, 0, 0), 16);
 
         screen.present();
     }

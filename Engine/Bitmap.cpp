@@ -1,85 +1,63 @@
 #include "Bitmap.h"
 
+#include "AsmRoutines.h"
 #include "Canvas.h"
 #include "Debug.h"
 
-#define DBMP_MASK16 0xF7DE
-
-void DDrawBmp(int nX, int nY, int nWidth, int nHeight, void* pBitmap, void* pPalette) {
-    Clipper clipper = {nX, nY, nWidth, nHeight, 0, 0, 0, 0};
+// Clip against the canvas and pack the blit arguments for the asm cores.
+static bool MakeBitmapArgs(int x, int y, int width, int height, void* bmPtr, void* palPtr, DBitmapArgs* args) {
+    DClipper clipper = {x, y, width, height, 0, 0, 0, 0};
     if (!GpCanvas->makeClipper(&clipper))
-        return;
+        return false;
 
-    BYTE* dst = (BYTE*)GpCanvas->frameBuffer + clipper.y * GpCanvas->pitch + clipper.x * 2;
-    const BYTE* src = (const BYTE*)pBitmap + clipper.top * nWidth + clipper.left;
-    const Pal16* pal = (const Pal16*)pPalette;
-
-    for (long row = 0; row < clipper.height; row++) {
-        WORD* dstPixel = (WORD*)dst;
-        for (long col = 0; col < clipper.width; col++)
-            *dstPixel++ = pal[*src++];
-        dst += GpCanvas->pitch;
-        src += nWidth - clipper.width;
-    }
+    args->frameBuffer = GpCanvas->frameBuffer;
+    args->pitch = (int)GpCanvas->pitch;
+    args->x = (int)clipper.x;
+    args->y = (int)clipper.y;
+    args->width = (int)clipper.width;
+    args->height = (int)clipper.height;
+    args->bmpWidth = width;
+    args->bmpHeight = height;
+    args->srcX = (int)clipper.left;
+    args->srcY = (int)clipper.top;
+    args->bitmap = bmPtr;
+    args->palette = palPtr;
+    return true;
 }
 
-void DDrawBmpTrans(int nX, int nY, int nWidth, int nHeight, void* pBitmap, void* pPalette) {
-    Clipper clipper = {nX, nY, nWidth, nHeight, 0, 0, 0, 0};
-    if (!GpCanvas->makeClipper(&clipper))
+void DDrawBitmap(int nX, int nY, int nWidth, int nHeight, void* pBitmap, void* pPalette) {
+    DBitmapArgs args;
+    if (!MakeBitmapArgs(nX, nY, nWidth, nHeight, pBitmap, pPalette, &args))
         return;
-
-    BYTE* dst = (BYTE*)GpCanvas->frameBuffer + clipper.y * GpCanvas->pitch + clipper.x * 2;
-    const BYTE* src = (const BYTE*)pBitmap + clipper.top * nWidth + clipper.left;
-    const Pal16* pal = (const Pal16*)pPalette;
-
-    for (long row = 0; row < clipper.height; row++) {
-        WORD* dstPixel = (WORD*)dst;
-        for (long col = 0; col < clipper.width; col++) {
-            WORD color = pal[*src++];
-            *dstPixel = (WORD)(((color & DBMP_MASK16) >> 1) + ((*dstPixel & DBMP_MASK16) >> 1));
-            dstPixel++;
-        }
-        dst += GpCanvas->pitch;
-        src += nWidth - clipper.width;
-    }
+    DDrawBitmapCore(&args);
 }
 
-void DDrawBmp16(int nX, int nY, int nWidth, int nHeight, void* pBitmap) {
-    Clipper clipper = {nX, nY, nWidth, nHeight, 0, 0, 0, 0};
-    if (!GpCanvas->makeClipper(&clipper))
+void DDrawBitmapTrans(int nX, int nY, int nWidth, int nHeight, void* pBitmap, void* pPalette) {
+    DBitmapArgs args;
+    if (!MakeBitmapArgs(nX, nY, nWidth, nHeight, pBitmap, pPalette, &args))
         return;
-
-    WORD* dst = (WORD*)((BYTE*)GpCanvas->frameBuffer + clipper.y * GpCanvas->pitch + clipper.x * 2);
-    const WORD* src = (const WORD*)pBitmap + clipper.top * nWidth + clipper.left;
-
-    for (long row = 0; row < clipper.height; row++) {
-        for (long col = 0; col < clipper.width; col++)
-            *dst++ = *src++;
-        dst = (WORD*)((BYTE*)dst + (GpCanvas->pitch - clipper.width * 2));
-        src += nWidth - clipper.width;
-    }
+    DDrawBitmapTransCore(&args);
 }
 
-void DDrawBmp16Mmx(int nX, int nY, int nWidth, int nHeight, void* pBitmap) {
-    // The MMX variant was only a speed-up of DDrawBmp16; same semantics.
-    DDrawBmp16(nX, nY, nWidth, nHeight, pBitmap);
+void DDrawBitmap16(int nX, int nY, int nWidth, int nHeight, void* pBitmap) {
+    DBitmapArgs args;
+    if (!MakeBitmapArgs(nX, nY, nWidth, nHeight, pBitmap, nullptr, &args))
+        return;
+    DDrawBitmap16Core(&args);
 }
 
-void DDrawBmp16Rev(int nX, int nY, int nWidth, int nHeight, void* pBitmap) {
-    Clipper clipper = {nX, nY, nWidth, nHeight, 0, 0, 0, 0};
-    if (!GpCanvas->makeClipper(&clipper))
+void DDrawBitmap16Mmx(int nX, int nY, int nWidth, int nHeight, void* pBitmap) {
+    DBitmapArgs args;
+    if (!MakeBitmapArgs(nX, nY, nWidth, nHeight, pBitmap, nullptr, &args))
         return;
+    DDrawBitmap16MmxCore(&args);
+}
 
-    WORD* dst = (WORD*)((BYTE*)GpCanvas->frameBuffer + clipper.y * GpCanvas->pitch + clipper.x * 2);
-    // Vertically flipped: the first canvas row reads the bitmap's last row.
-    const WORD* src = (const WORD*)pBitmap + (nHeight - 1 - clipper.top) * nWidth + clipper.left;
-
-    for (long row = 0; row < clipper.height; row++) {
-        for (long col = 0; col < clipper.width; col++)
-            *dst++ = *src++;
-        dst = (WORD*)((BYTE*)dst + (GpCanvas->pitch - clipper.width * 2));
-        src -= nWidth + clipper.width;
-    }
+void DDrawBitmap16Rev(int nX, int nY, int nWidth, int nHeight, void* pBitmap) {
+    DBitmapArgs args;
+    if (!MakeBitmapArgs(nX, nY, nWidth, nHeight, pBitmap, nullptr, &args))
+        return;
+    DDrawBitmap16RevCore(&args);
 }
 
 DBitmap::DBitmap() {
@@ -112,7 +90,7 @@ void DBitmap::Fill(BYTE fill) {
 
 void DBitmap::MakePalette() {
     if (bpp == 8)
-        Pal32To16((Pal32*)pal32.GetMemPtr(), (Pal16*)pal16.GetMemPtr(), colors);
+        DPal32To16((Pal32*)pal32.GetMemPtr(), (Pal16*)pal16.GetMemPtr(), colors);
 }
 
 void DBitmap::Draw(int x, int y) {
@@ -122,11 +100,11 @@ void DBitmap::Draw(int x, int y) {
         return;
     switch (bpp) {
         case 8:
-            DDrawBmp(x, y, width, height, bmPtr, palPtr);
+            DDrawBitmap(x, y, width, height, bmPtr, palPtr);
             break;
 
         case 16:
-            DDrawBmp16Mmx(x, y, width, height, bmPtr);
+            DDrawBitmap16Mmx(x, y, width, height, bmPtr);
             break;
     }
 }
@@ -153,7 +131,7 @@ void DBitmap::CreateAlphaLigth(DBitmap* bm) {
     Pal32* pal = bm->GetPalette();
     for (long i = 0; i < width * height; i++) {
         if (colorKey != *image) {
-            a = RgbToGray(pal[*image].Red, pal[*image].Green, pal[*image].Blue);
+            a = DRgbToGray(pal[*image].Red, pal[*image].Green, pal[*image].Blue);
             a = ((a * 2) / 16) * 16;
             if (a > 255)
                 a = 255;
