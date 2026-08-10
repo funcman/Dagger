@@ -13,7 +13,7 @@ DMemPool::DMemPool() {
     DDebugLog("GpMemPool ready.");
     // init blocks
     for (int i = 0; i < NUM_BLOCK; ++i) {
-        blockSizes_[i] = (1 << MIN_BLOCK);
+        blockSizes_[i] = (1 << (MIN_BLOCK + i));
     }
     memset(blocks_, 0, sizeof(blocks_));
 }
@@ -62,11 +62,8 @@ void DMemPool::FreeChunk_(struct ChunkHeader_* ch) {
 }
 
 void DMemPool::FreeChunkList_() {
-    for (
-        std::list<struct ChunkHeader_*>::iterator itr = chunks_.begin();
-        itr != chunks_.end();
-        ++itr) {
-        struct ChunkHeader_* ch = *itr;
+    while (!chunks_.empty()) {
+        struct ChunkHeader_* ch = chunks_.front();
         unsigned char* bp = ((unsigned char*)ch) + sizeof(struct ChunkHeader_);
         for (int i = 0; i < ch->blockNum; ++i) {
             struct BlockHeader_* bh = (struct BlockHeader_*)bp;
