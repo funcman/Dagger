@@ -1,13 +1,15 @@
 #ifndef	DAGGER_NODE_H
 #define	DAGGER_NODE_H
 
+#include <stdint.h>
+
 #include "TypeDef.h"
 
 class DAGGER_API DNode {
 public:
 	DNode*		prev;
 	DNode*		next;
-	DWORD		thisPtr;
+	uintptr_t	thisPtr;
 	DWORD		data;
 public:
 	DNode();

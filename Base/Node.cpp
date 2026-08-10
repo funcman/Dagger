@@ -11,11 +11,11 @@ DNode::DNode() {
 }
 
 bool DNode::IsValid() {
-    return (thisPtr == (DWORD)((uintptr_t)prev + (uintptr_t)next));
+    return (thisPtr == ((uintptr_t)prev + (uintptr_t)next));
 }
 
 void DNode::SetThis() {
-    thisPtr = (DWORD)((uintptr_t)prev + (uintptr_t)next);
+    thisPtr = ((uintptr_t)prev + (uintptr_t)next);
 }
 
 DNode* DNode::GetPrev() {
