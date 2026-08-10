@@ -33,24 +33,24 @@ void AsmDrawPixelAlpha16(const AsmPixelArgs* args) {
     *pixel = static_cast<uint16_t>((blended >> 16) | (blended & 0xffff));
 }
 
-unsigned short AsmRGB555(int nRed, int nGreen, int nBlue) {
+unsigned short AsmRGB555(int r, int g, int b) {
     return static_cast<uint16_t>(
-        ((nRed   & 0xff) >> 3) << 10 |
-        ((nGreen & 0xff) >> 3) << 5  |
-        ((nBlue  & 0xff) >> 3));
+        ((r & 0xff) >> 3) << 10 |
+        ((g & 0xff) >> 3) << 5  |
+        ((b & 0xff) >> 3));
 }
 
-unsigned short AsmRGB565(int nRed, int nGreen, int nBlue) {
+unsigned short AsmRGB565(int r, int g, int b) {
     return static_cast<uint16_t>(
-        ((nRed   & 0xff) >> 3) << 11 |
-        ((nGreen & 0xff) >> 2) << 5  |
-        ((nBlue  & 0xff) >> 3));
+        ((r & 0xff) >> 3) << 11 |
+        ((g & 0xff) >> 2) << 5  |
+        ((b & 0xff) >> 3));
 }
 
-void AsmRGB555To565(int nWidth, int nHeight, void* lpBitmap) {
-    auto* p = static_cast<uint16_t*>(lpBitmap);
-    for (int y = 0; y < nHeight; ++y) {
-        for (int x = 0; x < nWidth; ++x) {
+void AsmRGB555To565(int width, int height, void* bm_ptr) {
+    auto* p = static_cast<uint16_t*>(bm_ptr);
+    for (int y = 0; y < height; ++y) {
+        for (int x = 0; x < width; ++x) {
             const uint16_t c = *p;
             // Shift red and green one bit to the left; keep blue.
             *p = static_cast<uint16_t>(((c & 0x7fe0) << 1) | (c & 0x001f));
@@ -59,10 +59,10 @@ void AsmRGB555To565(int nWidth, int nHeight, void* lpBitmap) {
     }
 }
 
-void AsmRGB565To555(int nWidth, int nHeight, void* lpBitmap) {
-    auto* p = static_cast<uint16_t*>(lpBitmap);
-    for (int y = 0; y < nHeight; ++y) {
-        for (int x = 0; x < nWidth; ++x) {
+void AsmRGB565To555(int width, int height, void* bm_ptr) {
+    auto* p = static_cast<uint16_t*>(bm_ptr);
+    for (int y = 0; y < height; ++y) {
+        for (int x = 0; x < width; ++x) {
             const uint16_t c = *p;
             // Shift red and green one bit to the right; keep blue.
             *p = static_cast<uint16_t>(((c & 0xffc0) >> 1) | (c & 0x001f));

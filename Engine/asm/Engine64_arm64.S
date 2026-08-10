@@ -111,7 +111,7 @@ SYMBOL(AsmRGB565):
     ret
 
 // --------------------------------------------------------------------------
-// void AsmRGB555To565(int w, int h, void* bmp)
+// void AsmRGB555To565(int w, int h, void* bm_ptr)
 // NEON inner loop: 8 pixels/iter, scalar tail.
 // --------------------------------------------------------------------------
     .globl SYMBOL(AsmRGB555To565)
@@ -151,7 +151,7 @@ SYMBOL(AsmRGB555To565):
     ret
 
 // --------------------------------------------------------------------------
-// void AsmRGB565To555(int w, int h, void* bmp)
+// void AsmRGB565To555(int w, int h, void* bm_ptr)
 // NEON inner loop: 8 pixels/iter, scalar tail.
 // --------------------------------------------------------------------------
     .globl SYMBOL(AsmRGB565To555)

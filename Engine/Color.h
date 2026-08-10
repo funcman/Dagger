@@ -33,15 +33,15 @@ void Pal32To16(Pal32* pPal32, Pal16* pPal16, int nColors);
 void Pal32To24(Pal32* pPal32, Pal24* pPal24, int nColors);
 void Pal32To16Blend(Pal32* pPal32, Pal16* pPal16, int nColors);
 
-WORD RGB555(int nRed, int nGreen, int nBlue);
-WORD RGB565(int nRed, int nGreen, int nBlue);
-void RGB565To555(int nWidth, int nHeight, void* lpBitmap);
-void RGB555To565(int nWidth, int nHeight, void* lpBitmap);
+WORD RGB555(int red, int green, int blue);
+WORD RGB565(int red, int green, int blue);
+void RGB565To555(int width, int height, void* bm_ptr);
+void RGB555To565(int width, int height, void* bm_ptr);
 void High2True555(Pal16 Pal16, Pal24* Pal24);
 void High2True565(Pal16 Pal16, Pal24* Pal24);
 BYTE RgbToGray(BYTE Red, BYTE Green, BYTE Blue);
 
-extern WORD (*GpRGB)(int nRed, int nGreen, int nBlue);
+extern WORD (*GpRGB)(int red, int green, int blue);
 extern void (*GpHigh2True)(Pal16 Pal16, Pal24* Pal24);
 
 #endif//DAGGER_COLOR_H

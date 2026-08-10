@@ -104,7 +104,7 @@ AsmRGB565 proc
 AsmRGB565 endp
 
 ; --------------------------------------------------------------------------
-; void AsmRGB555To565(int w, int h, void* bmp)       ; ecx/edx/r8
+; void AsmRGB555To565(int w, int h, void* bm_ptr)       ; ecx/edx/r8
 ; --------------------------------------------------------------------------
 public AsmRGB555To565
 AsmRGB555To565 proc
@@ -128,7 +128,7 @@ col_555to565:
 AsmRGB555To565 endp
 
 ; --------------------------------------------------------------------------
-; void AsmRGB565To555(int w, int h, void* bmp)       ; ecx/edx/r8
+; void AsmRGB565To555(int w, int h, void* bm_ptr)       ; ecx/edx/r8
 ; --------------------------------------------------------------------------
 public AsmRGB565To555
 AsmRGB565To555 proc

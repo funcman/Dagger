@@ -40,6 +40,7 @@ add_library(DEngine SHARED
     Color.cpp
     DrawLine.cpp
     DrawPixel.cpp
+    Bitmap.cpp
     ${ENGINE_ASM_SOURCES}
 )
 

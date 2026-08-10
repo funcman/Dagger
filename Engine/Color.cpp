@@ -10,7 +10,7 @@ typedef struct {
 
 static Palette m_Alpha = {0, 0, 0};
 
-WORD (*GpRGB)(int nRed, int nGreen, int nBlue) = RGB565;
+WORD (*GpRGB)(int red, int green, int blue) = RGB565;
 void (*GpHigh2True)(Pal16 Pal16, Pal24* Pal24) = High2True565;
 
 void SetAlphaValue(int Red, int Green, int Blue) {
@@ -138,20 +138,20 @@ void Pal32To16Blend(Pal32* pPal32, Pal16* pPal16, int nColors) {
     }
 }
 
-WORD RGB555(int nRed, int nGreen, int nBlue) {
-    return AsmRGB555(nRed, nGreen, nBlue);
+WORD RGB555(int red, int green, int blue) {
+    return AsmRGB555(red, green, blue);
 }
 
-WORD RGB565(int nRed, int nGreen, int nBlue) {
-    return AsmRGB565(nRed, nGreen, nBlue);
+WORD RGB565(int red, int green, int blue) {
+    return AsmRGB565(red, green, blue);
 }
 
-void RGB555To565(int nWidth, int nHeight, void* lpBitmap) {
-    AsmRGB555To565(nWidth, nHeight, lpBitmap);
+void RGB555To565(int width, int height, void* bm_ptr) {
+    AsmRGB555To565(width, height, bm_ptr);
 }
 
-void RGB565To555(int nWidth, int nHeight, void* lpBitmap) {
-    AsmRGB565To555(nWidth, nHeight, lpBitmap);
+void RGB565To555(int width, int height, void* bm_ptr) {
+    AsmRGB565To555(width, height, bm_ptr);
 }
 
 void High2True555(Pal16 Pal16, Pal24* Pal24) {

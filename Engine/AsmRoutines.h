@@ -23,12 +23,12 @@ void AsmDrawPixel16(const AsmPixelArgs* args);
 // Blend a 16-bit pixel with alpha (0~32)
 void AsmDrawPixelAlpha16(const AsmPixelArgs* args);
 
-unsigned short AsmRGB555(int nRed, int nGreen, int nBlue);
-unsigned short AsmRGB565(int nRed, int nGreen, int nBlue);
+unsigned short AsmRGB555(int red, int green, int blue);
+unsigned short AsmRGB565(int red, int green, int blue);
 
 // Convert width*height 16-bit pixels in place
-void AsmRGB555To565(int nWidth, int nHeight, void* lpBitmap);
-void AsmRGB565To555(int nWidth, int nHeight, void* lpBitmap);
+void AsmRGB555To565(int width, int height, void* bm_ptr);
+void AsmRGB565To555(int width, int height, void* bm_ptr);
 
 }  // extern "C"
 
