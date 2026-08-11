@@ -13,7 +13,12 @@
 
 typedef unsigned char       BYTE;
 typedef unsigned short int  WORD;
+#ifdef _WIN32
+// Match the Windows SDK (minwindef.h) exactly; unsigned int would clash with it.
+typedef unsigned long       DWORD;
+#else
 typedef unsigned int        DWORD;
+#endif
 typedef unsigned int        UINT;
 
 #endif//DAGGER_TYPES_H

@@ -4,11 +4,13 @@
 #include <stdlib.h>
 #include <string.h>
 
+#if defined(_WIN32)
+// Must precede SDL.h: SDL pulls in <intrin.h>, which conflicts with winnt.h
+// if it is included first.
+#include <windows.h>
+#endif
 #if defined(DAGGER_HAS_SDL3)
 #include <SDL3/SDL.h>
-#endif
-#if defined(_WIN32)
-#include <windows.h>
 #endif
 #if defined(__APPLE__) || defined(__linux__)
 #include <unistd.h>
