@@ -6,6 +6,7 @@ add_library(DBase SHARED
     List.cpp
     Md5.cpp
     System.cpp
+    BinFile.cpp
 )
 
 # Auto-export all symbols on Windows; no need for __declspec(dllexport)

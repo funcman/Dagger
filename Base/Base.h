@@ -1,6 +1,7 @@
 #ifndef DAGGER_BASE_H
 #define DAGGER_BASE_H
 
+#include "BinFile.h"
 #include "Debug.h"
 #include "List.h"
 #include "Md5.h"
