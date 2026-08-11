@@ -18,6 +18,7 @@
 #include "PakPack.h"
 #include "PakPath.h"
 #include "PakScan.h"
+#include "StrList.h"
 #include "System.h"
 #include "Timer.h"
 #include "TxtFile.h"
