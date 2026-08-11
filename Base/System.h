@@ -17,6 +17,7 @@ bool DFileExists(char const* file);
 void DPathChangeExt(char* file, char const* ext);
 void DPathExtractName(char* out, char const* path);
 void DPathExtractPath(char* out, char const* path);
+void DPathGetHalf(char* out, char const* path);
 DWORD DHashString(char const* str);
 DWORD DHashMemory(BYTE const* mem, int len);
 void DStrLCopy(char* dest, char const* src, int len);
@@ -27,5 +28,8 @@ void DClipboardSetText(char const* text);
 void DIMEClose();
 void DIMEOpen();
 void DStrReplaceChar(char* str, char from, char to);
+
+extern char DRootPath[DMAX_PATH];
+extern char DCurrPath[DMAX_PATH];
 
 #endif

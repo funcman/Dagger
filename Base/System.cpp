@@ -23,8 +23,11 @@
 SDL_Window* GpSdlWindow = nullptr;
 #endif
 
-static char rootPath_[DMAX_PATH] = "/";
-static char currPath_[DMAX_PATH] = "/";
+char DRootPath[DMAX_PATH] = "/";
+char DCurrPath[DMAX_PATH] = "/";
+
+static char* rootPath_ = DRootPath;
+static char* currPath_ = DCurrPath;
 static bool rootInit_ = false;
 
 static void DPathNormalize(char* path) {
@@ -178,6 +181,28 @@ void DPathExtractPath(char* out, char const* path) {
             out[len] = 0;
             return;
         }
+    }
+}
+
+void DPathGetHalf(char* out, char const* path) {
+    // Mirrors GmGetHalfPath: strip absolute root prefix, prepend current path
+    // when relative, then lowercase the result. Used as the key input for
+    // DHashString, so Pack-time and runtime must agree exactly.
+    if (path[1] == ':' && path[0]) {
+        int rootLen = strlen(DRootPath);
+        if (rootLen > 0 && strncmp(path, DRootPath, rootLen) == 0) {
+            DStrLCopy(out, path + rootLen, DMAX_PATH - 1);
+        } else {
+            DStrLCopy(out, path, DMAX_PATH - 1);
+        }
+    } else if (path[0] == '\\' || path[0] == '/') {
+        DStrLCopy(out, path, DMAX_PATH - 1);
+    } else {
+        DStrLCopy(out, DCurrPath, DMAX_PATH - 1);
+        strncat(out, path, DMAX_PATH - strlen(out) - 1);
+    }
+    for (int i = 0; out[i]; ++i) {
+        out[i] = (char)tolower((unsigned char)out[i]);
     }
 }
 

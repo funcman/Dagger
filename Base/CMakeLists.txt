@@ -10,6 +10,15 @@ add_library(DBase SHARED
     BinFile.cpp
     CsvFile.cpp
     IniFile.cpp
+    PakCode.cpp
+    PakFile.cpp
+    PakList.cpp
+    PakMake.cpp
+    PakNode.cpp
+    PakPack.cpp
+    PakPath.cpp
+    PakScan.cpp
+    TxtFile.cpp
 )
 
 # Auto-export all symbols on Windows; no need for __declspec(dllexport)
