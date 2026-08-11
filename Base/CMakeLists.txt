@@ -4,9 +4,12 @@ add_library(DBase SHARED
     MemPool.cpp
     Node.cpp
     List.cpp
+    HashList.cpp
     Md5.cpp
     System.cpp
     BinFile.cpp
+    CsvFile.cpp
+    IniFile.cpp
 )
 
 # Auto-export all symbols on Windows; no need for __declspec(dllexport)
