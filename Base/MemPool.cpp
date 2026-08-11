@@ -126,7 +126,7 @@ void DMemPool::Free(void* mem, char const* file, int line) {
     unsigned char* pc = (unsigned char*)mem;
     struct BlockHeader* bh = (struct BlockHeader*)(pc - sizeof(struct BlockHeader));
     if (bh->data != mem) {
-        DDebugLog("DMemPool::Free() Fail, File=%s, Line=%s", file, line);
+        DDebugLog("DMemPool::Free() Fail, File=%s, Line=%d", file, line);
         return;
     }
     // zero clearing
