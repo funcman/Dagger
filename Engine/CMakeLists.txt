@@ -41,6 +41,7 @@ add_library(DEngine SHARED
     DrawLine.cpp
     DrawPixel.cpp
     Bitmap.cpp
+    Quad.cpp
     ${ENGINE_ASM_SOURCES}
 )
 

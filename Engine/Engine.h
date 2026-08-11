@@ -6,5 +6,6 @@
 #include "DrawLine.h"
 #include "DrawPixel.h"
 #include "Macros.h"
+#include "Quad.h"
 
 #endif//DAGGER_ENGINE_H
