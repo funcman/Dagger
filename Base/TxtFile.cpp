@@ -37,10 +37,10 @@ void DTxtFile::OpenMem(void* buffer, DWORD length) {
 void DTxtFile::ReadAllLines() {
     char* pHead = (char*)memFile_.GetMemPtr();
     char* pTail = pHead + size_;
-    // Two sentinel bytes guarantee the final line is picked up even when the
-    // source file lacks a trailing newline.
-    pTail[0] = '\r';
-    pTail[1] = '\n';
+    // A single '\n' sentinel at pTail[0] guarantees the final line is picked
+    // up even when the source file lacks a trailing newline, regardless of
+    // whether the file uses LF, CRLF, or bare CR line endings.
+    pTail[0] = '\n';
     lineCount_ = 0;
     while (pHead < pTail) {
         DTxtLine* line = (DTxtLine*)DCAlloc(sizeof(DTxtLine));
@@ -52,14 +52,14 @@ void DTxtFile::ReadAllLines() {
 }
 
 char* DTxtFile::GotoNextLine(char* pHead, char* pTail) {
-    while (pHead < pTail && *pHead != '\r') {
+    while (pHead < pTail && *pHead != '\r' && *pHead != '\n') {
         pHead++;
     }
-    if (*pHead == '\r') {
+    if (pHead < pTail && *pHead == '\r') {
         *pHead = 0;
         pHead++;
     }
-    if (*pHead == '\n') {
+    if (pHead < pTail && *pHead == '\n') {
         *pHead = 0;
         pHead++;
     }

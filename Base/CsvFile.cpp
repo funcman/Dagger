@@ -20,14 +20,15 @@ bool DCsvFile::Load(char const* fileName) {
     if (!csvBuf_) return false;
     file.Read(csvBuf_, size);
     csvBuf_[size] = 0;
-    rows_.push_back(csvBuf_);
+    rows_.push_back(&csvBuf_[0]);
     for (DWORD i = 0; i < size; ++i) {
         if (csvBuf_[i] == '\n') {
             csvBuf_[i] = 0;
-            if (i + 1 < size) rows_.push_back(&csvBuf_[i + 1]);
-        } else if (csvBuf_[i] == '\r') {
-            csvBuf_[i] = 0;
+            rows_.push_back(&csvBuf_[i + 1]);
         }
+        // '\r' is intentionally left in place: GetStr treats it as a column
+        // terminator, matching the legacy KmCsvFile behavior used for CR-only
+        // and CRLF input.
     }
     return true;
 }
