@@ -25,10 +25,10 @@ struct DPakIndex {
 
 class DPakNode : public DNode {
 public:
-    DBinFile zipFile_;
-    DMemory zipOffs_;
-    std::mutex mutex_;
-    DWORD fileNum_;
+    DBinFile zipFile;
+    DMemory zipOffs;
+    std::mutex mutex;
+    DWORD fileNum;
 
 public:
     DPakNode();
@@ -42,10 +42,10 @@ public:
     void Close();
     bool Find(char const* fileName, DPakIndex* index);
     void Lock() {
-        mutex_.lock();
+        mutex.lock();
     }
     void Unlock() {
-        mutex_.unlock();
+        mutex.unlock();
     }
 };
 

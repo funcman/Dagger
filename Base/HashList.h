@@ -8,8 +8,8 @@ const int DHASH_SIZE = 100;
 
 class DNameNode : public DNode {
 public:
-    char name_[80];
-    DNode* hashNode_;
+    char name[80];
+    DNode* hashNode;
     void SetName(char const* name);
     void Remove();
     void Delete();

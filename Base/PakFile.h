@@ -25,10 +25,10 @@ public:
     bool Save(char const* fileName);
 
 private:
-    void ReadBlock(BYTE* buf, int block);
-    bool OpenPack(char const* fileName);
-    DWORD ReadPack(void* buffer, DWORD size);
-    DWORD SeekPack(long offset, DWORD method);
+    void ReadBlock_(BYTE* buf, int block);
+    bool OpenPack_(char const* fileName);
+    DWORD ReadPack_(void* buffer, DWORD size);
+    DWORD SeekPack_(long offset, DWORD method);
 
     DBinFile file_;
     DMemory memFile_;

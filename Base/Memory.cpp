@@ -4,8 +4,8 @@
 #include <string.h>
 
 DMemory::DMemory() {
-    memPtr_ = NULL;
-    memLen_ = 0;
+    memPtr = NULL;
+    memLen = 0;
 }
 
 DMemory::~DMemory() {
@@ -13,30 +13,30 @@ DMemory::~DMemory() {
 }
 
 void* DMemory::Alloc(DWORD size) {
-    if (memPtr_)
+    if (memPtr)
         Free();
-    memLen_ = size;
-    memPtr_ = DCAlloc(memLen_);
-    return memPtr_;
+    memLen = size;
+    memPtr = DCAlloc(memLen);
+    return memPtr;
 }
 
 void DMemory::Free() {
-    DFree(memPtr_);
-    memPtr_ = NULL;
-    memLen_ = 0;
+    DFree(memPtr);
+    memPtr = NULL;
+    memLen = 0;
 }
 
 void DMemory::Zero() {
-    if (memPtr_)
-        memset(memPtr_, 0, memLen_);
+    if (memPtr)
+        memset(memPtr, 0, memLen);
 }
 
 void DMemory::Fill(BYTE fill) {
-    if (memPtr_)
-        memset(memPtr_, fill, memLen_);
+    if (memPtr)
+        memset(memPtr, fill, memLen);
 }
 
 void DMemory::Copy(void* data, DWORD size) {
     Alloc(size);
-    memcpy(memPtr_, data, size);
+    memcpy(memPtr, data, size);
 }

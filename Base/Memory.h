@@ -5,8 +5,8 @@
 
 class DMemory {
 public:
-    void* memPtr_;
-    DWORD memLen_;
+    void* memPtr;
+    DWORD memLen;
 
 public:
     DMemory();
@@ -17,10 +17,10 @@ public:
     void Fill(BYTE fill);
     void Copy(void* data, DWORD size);
     void* GetMemPtr() {
-        return memPtr_;
+        return memPtr;
     };
     DWORD GetMemLen() {
-        return memLen_;
+        return memLen;
     };
 };
 

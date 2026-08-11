@@ -26,7 +26,7 @@ bool DTxtFile::Open(char const* fileName) {
     if (size > 0)
         file.Read(memFile_.GetMemPtr(), size);
     size_ = size;
-    ReadAllLines();
+    ReadAllLines_();
     return true;
 }
 
@@ -36,10 +36,10 @@ void DTxtFile::OpenMem(void* buffer, DWORD length) {
     if (buffer && length > 0)
         memcpy(memFile_.GetMemPtr(), buffer, length);
     size_ = length;
-    ReadAllLines();
+    ReadAllLines_();
 }
 
-void DTxtFile::ReadAllLines() {
+void DTxtFile::ReadAllLines_() {
     char* pHead = (char*)memFile_.GetMemPtr();
     char* pTail = pHead + size_;
     // A single '\n' sentinel at pTail[0] guarantees the final line is picked
@@ -49,14 +49,14 @@ void DTxtFile::ReadAllLines() {
     lineCount_ = 0;
     while (pHead < pTail) {
         DTxtLine* line = (DTxtLine*)DCAlloc(sizeof(DTxtLine));
-        line->line_ = pHead;
+        line->line = pHead;
         lineList_.AddTail(line);
-        pHead = GotoNextLine(pHead, pTail);
+        pHead = GotoNextLine_(pHead, pTail);
         lineCount_++;
     }
 }
 
-char* DTxtFile::GotoNextLine(char* pHead, char* pTail) {
+char* DTxtFile::GotoNextLine_(char* pHead, char* pTail) {
     while (pHead < pTail && *pHead != '\r' && *pHead != '\n') {
         pHead++;
     }
@@ -80,16 +80,16 @@ void DTxtFile::Close() {
 
 char* DTxtFile::FirstLine() {
     currLine_ = (DTxtLine*)lineList_.GetHead();
-    return currLine_ ? currLine_->line_ : nullptr;
+    return currLine_ ? currLine_->line : nullptr;
 }
 
 char* DTxtFile::NextLine() {
     if (!currLine_)
         return nullptr;
     currLine_ = (DTxtLine*)currLine_->GetNext();
-    return currLine_ ? currLine_->line_ : nullptr;
+    return currLine_ ? currLine_->line : nullptr;
 }
 
 char* DTxtFile::CurrLine() {
-    return currLine_ ? currLine_->line_ : nullptr;
+    return currLine_ ? currLine_->line : nullptr;
 }

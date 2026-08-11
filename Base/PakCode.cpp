@@ -118,13 +118,13 @@ void DPakCode::FreeLib() {
 
 void DPakCode::Encode(DPakCodeInfo* info) {
     if (handle_ && encode_) {
-        encode_(info->packBuf_, &info->packLen_, info->dataBuf_, info->dataLen_);
+        encode_(info->packBuf, &info->packLen, info->dataBuf, info->dataLen);
     }
 }
 
 void DPakCode::Decode(DPakCodeInfo* info) {
     if (handle_ && decode_) {
-        decode_(info->dataBuf_, &info->dataLen_, info->packBuf_, info->packLen_);
+        decode_(info->dataBuf, &info->dataLen, info->packBuf, info->packLen);
     }
 }
 

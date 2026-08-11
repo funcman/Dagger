@@ -8,7 +8,7 @@
 
 class DTxtLine : public DNode {
 public:
-    char* line_;
+    char* line;
 };
 
 class DAGGER_API DTxtFile {
@@ -26,8 +26,8 @@ public:
     };
 
 private:
-    void ReadAllLines();
-    char* GotoNextLine(char* head, char* tail);
+    void ReadAllLines_();
+    char* GotoNextLine_(char* head, char* tail);
 
     DMemory memFile_;
     DList lineList_;

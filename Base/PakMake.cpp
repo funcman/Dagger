@@ -100,8 +100,8 @@ bool DPakMake::Pack(char const* listFile, char const* packFile) {
 
     offset = pack.Tell();
 
-    info.dataBuf_ = (BYTE*)DCAlloc(BLOCK_SIZE);
-    info.packBuf_ = (BYTE*)DCAlloc(GpPakCode->GetPackLen(BLOCK_SIZE));
+    info.dataBuf = (BYTE*)DCAlloc(BLOCK_SIZE);
+    info.packBuf = (BYTE*)DCAlloc(GpPakCode->GetPackLen(BLOCK_SIZE));
 
     DPathSetCurrent(pRootPath);
     for (int i = 0; i < nFileNum; i++) {
@@ -110,8 +110,8 @@ bool DPakMake::Pack(char const* listFile, char const* packFile) {
             DDebugLog("Can't open file...%s", pFileList[i].fileName);
             DFree(pFileList);
             DFree(pOffsList);
-            DFree(info.dataBuf_);
-            DFree(info.packBuf_);
+            DFree(info.dataBuf);
+            DFree(info.packBuf);
             return false;
         }
         DDebugLog("packing file %s...", pFileList[i].fileName);
@@ -133,31 +133,31 @@ bool DPakMake::Pack(char const* listFile, char const* packFile) {
 
         int j = 0;
         for (; length >= BLOCK_SIZE; length -= BLOCK_SIZE, j++) {
-            listFile.Read(info.dataBuf_, BLOCK_SIZE);
-            info.dataLen_ = BLOCK_SIZE;
-            info.packLen_ = GpPakCode->GetPackLen(BLOCK_SIZE);
+            listFile.Read(info.dataBuf, BLOCK_SIZE);
+            info.dataLen = BLOCK_SIZE;
+            info.packLen = GpPakCode->GetPackLen(BLOCK_SIZE);
             GpPakCode->Encode(&info);
-            if (info.packLen_ >= BLOCK_SIZE) {
+            if (info.packLen >= BLOCK_SIZE) {
                 blockSize[j] = 0;
-                pack.Write(info.dataBuf_, BLOCK_SIZE);
+                pack.Write(info.dataBuf, BLOCK_SIZE);
             } else {
-                blockSize[j] = (WORD)info.packLen_;
-                pack.Write(info.packBuf_, info.packLen_);
+                blockSize[j] = (WORD)info.packLen;
+                pack.Write(info.packBuf, info.packLen);
             }
         }
 
         // Last block: if compression produced output >= 64K, store uncompressed.
         if (length > 0) {
-            listFile.Read(info.dataBuf_, length);
-            info.dataLen_ = length;
-            info.packLen_ = GpPakCode->GetPackLen(length);
+            listFile.Read(info.dataBuf, length);
+            info.dataLen = length;
+            info.packLen = GpPakCode->GetPackLen(length);
             GpPakCode->Encode(&info);
-            if (info.packLen_ >= BLOCK_SIZE) {
+            if (info.packLen >= BLOCK_SIZE) {
                 blockSize[j] = 0;
-                pack.Write(info.dataBuf_, BLOCK_SIZE);
+                pack.Write(info.dataBuf, BLOCK_SIZE);
             } else {
-                blockSize[j] = (WORD)info.packLen_;
-                pack.Write(info.packBuf_, info.packLen_);
+                blockSize[j] = (WORD)info.packLen;
+                pack.Write(info.packBuf, info.packLen);
             }
         }
 
@@ -167,27 +167,27 @@ bool DPakMake::Pack(char const* listFile, char const* packFile) {
         listFile.Close();
     }
 
-    DFree(info.dataBuf_);
-    DFree(info.packBuf_);
+    DFree(info.dataBuf);
+    DFree(info.packBuf);
 
-    info.dataLen_ = nFileNum * sizeof(DPakOffsList);
-    info.dataBuf_ = (BYTE*)pOffsList;
-    info.packLen_ = GpPakCode->GetPackLen(info.dataLen_);
-    info.packBuf_ = (BYTE*)DCAlloc(info.packLen_);
+    info.dataLen = nFileNum * sizeof(DPakOffsList);
+    info.dataBuf = (BYTE*)pOffsList;
+    info.packLen = GpPakCode->GetPackLen(info.dataLen);
+    info.packBuf = (BYTE*)DCAlloc(info.packLen);
     GpPakCode->Encode(&info);
 
     pack.Seek(0, DFILE_END);
     header.fileOffset = pack.Tell();
     DWORD magic = ZIP_MAGIC;
     pack.Write(&magic, sizeof(DWORD));
-    pack.Write(&info.packLen_, sizeof(DWORD));
-    pack.Write(&info.dataLen_, sizeof(DWORD));
-    pack.Write(info.packBuf_, info.packLen_);
+    pack.Write(&info.packLen, sizeof(DWORD));
+    pack.Write(&info.dataLen, sizeof(DWORD));
+    pack.Write(info.packBuf, info.packLen);
     header.listOffset = pack.Tell();
 
     DFree(pFileList);
     DFree(pOffsList);
-    DFree(info.packBuf_);
+    DFree(info.packBuf);
 
     DStrLCopy(szListFile, listFile, DMAX_PATH - 1);
     DPathChangeExt(szListFile, ".dir");
@@ -195,40 +195,40 @@ bool DPakMake::Pack(char const* listFile, char const* packFile) {
     DBinFile dirFile;
     if (!dirFile.Open(szListFile))
         return false;
-    info.dataLen_ = dirFile.Size();
-    info.dataBuf_ = (BYTE*)DCAlloc(info.dataLen_);
-    info.packLen_ = GpPakCode->GetPackLen(info.dataLen_);
-    info.packBuf_ = (BYTE*)DCAlloc(info.packLen_);
-    dirFile.Read(info.dataBuf_, info.dataLen_);
+    info.dataLen = dirFile.Size();
+    info.dataBuf = (BYTE*)DCAlloc(info.dataLen);
+    info.packLen = GpPakCode->GetPackLen(info.dataLen);
+    info.packBuf = (BYTE*)DCAlloc(info.packLen);
+    dirFile.Read(info.dataBuf, info.dataLen);
     dirFile.Close();
     GpPakCode->Encode(&info);
     pack.Seek(0, DFILE_END);
     pack.Write(&magic, sizeof(DWORD));
-    pack.Write(&info.packLen_, sizeof(DWORD));
-    pack.Write(&info.dataLen_, sizeof(DWORD));
-    pack.Write(info.packBuf_, info.packLen_);
-    DFree(info.dataBuf_);
-    DFree(info.packBuf_);
+    pack.Write(&info.packLen, sizeof(DWORD));
+    pack.Write(&info.dataLen, sizeof(DWORD));
+    pack.Write(info.packBuf, info.packLen);
+    DFree(info.dataBuf);
+    DFree(info.packBuf);
 
     DPathChangeExt(szListFile, ".txt");
     DPathSetCurrent((char*)"/");
     DBinFile txtFile;
     if (!txtFile.Open(szListFile))
         return false;
-    info.dataLen_ = txtFile.Size();
-    info.dataBuf_ = (BYTE*)DCAlloc(info.dataLen_);
-    info.packLen_ = GpPakCode->GetPackLen(info.dataLen_);
-    info.packBuf_ = (BYTE*)DCAlloc(info.packLen_);
-    txtFile.Read(info.dataBuf_, info.dataLen_);
+    info.dataLen = txtFile.Size();
+    info.dataBuf = (BYTE*)DCAlloc(info.dataLen);
+    info.packLen = GpPakCode->GetPackLen(info.dataLen);
+    info.packBuf = (BYTE*)DCAlloc(info.packLen);
+    txtFile.Read(info.dataBuf, info.dataLen);
     txtFile.Close();
     GpPakCode->Encode(&info);
     pack.Seek(0, DFILE_END);
     pack.Write(&magic, sizeof(DWORD));
-    pack.Write(&info.packLen_, sizeof(DWORD));
-    pack.Write(&info.dataLen_, sizeof(DWORD));
-    pack.Write(info.packBuf_, info.packLen_);
-    DFree(info.dataBuf_);
-    DFree(info.packBuf_);
+    pack.Write(&info.packLen, sizeof(DWORD));
+    pack.Write(&info.dataLen, sizeof(DWORD));
+    pack.Write(info.packBuf, info.packLen);
+    DFree(info.dataBuf);
+    DFree(info.packBuf);
 
     pack.Seek(0, DFILE_BEGIN);
     pack.Write(&header, sizeof(header));
@@ -256,18 +256,18 @@ bool DPakMake::UnPack(char const* datFile, char const* outPath) {
     packFile.Read(&magic, sizeof(DWORD));
     if (magic != ZIP_MAGIC)
         return false;
-    packFile.Read(&info.packLen_, sizeof(DWORD));
-    packFile.Read(&info.dataLen_, sizeof(DWORD));
+    packFile.Read(&info.packLen, sizeof(DWORD));
+    packFile.Read(&info.dataLen, sizeof(DWORD));
 
-    info.dataBuf_ = (BYTE*)DCAlloc(info.dataLen_);
-    info.packBuf_ = (BYTE*)DCAlloc(info.packLen_);
-    packFile.Read(info.packBuf_, info.packLen_);
+    info.dataBuf = (BYTE*)DCAlloc(info.dataLen);
+    info.packBuf = (BYTE*)DCAlloc(info.packLen);
+    packFile.Read(info.packBuf, info.packLen);
     GpPakCode->Decode(&info);
 
     DTxtFile textFile;
-    textFile.OpenMem(info.dataBuf_, info.dataLen_);
-    DFree(info.dataBuf_);
-    DFree(info.packBuf_);
+    textFile.OpenMem(info.dataBuf, info.dataLen);
+    DFree(info.dataBuf);
+    DFree(info.packBuf);
 
     DPathSetCurrent((char*)outPath);
     char* pLine = textFile.FirstLine();
@@ -282,18 +282,18 @@ bool DPakMake::UnPack(char const* datFile, char const* outPath) {
     packFile.Read(&magic, sizeof(DWORD));
     if (magic != ZIP_MAGIC)
         return false;
-    packFile.Read(&info.packLen_, sizeof(DWORD));
-    packFile.Read(&info.dataLen_, sizeof(DWORD));
+    packFile.Read(&info.packLen, sizeof(DWORD));
+    packFile.Read(&info.dataLen, sizeof(DWORD));
 
-    info.dataBuf_ = (BYTE*)DCAlloc(info.dataLen_);
-    info.packBuf_ = (BYTE*)DCAlloc(info.packLen_);
-    packFile.Read(info.packBuf_, info.packLen_);
+    info.dataBuf = (BYTE*)DCAlloc(info.dataLen);
+    info.packBuf = (BYTE*)DCAlloc(info.packLen);
+    packFile.Read(info.packBuf, info.packLen);
     packFile.Close();
     GpPakCode->Decode(&info);
 
-    textFile.OpenMem(info.dataBuf_, info.dataLen_);
-    DFree(info.dataBuf_);
-    DFree(info.packBuf_);
+    textFile.OpenMem(info.dataBuf, info.dataLen);
+    DFree(info.dataBuf);
+    DFree(info.packBuf);
 
     DSetPakFileMode(DPAK_PACK_FIRST);
     DPathSetCurrent((char*)outPath);

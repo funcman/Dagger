@@ -24,13 +24,13 @@ public:
     void FreeAll();
 
 public:
-    struct ChunkHeader_ {
+    struct ChunkHeader {
         long blockNum;
         long blockSize;
-        std::list<struct ChunkHeader_*>::iterator itr;
+        std::list<struct ChunkHeader*>::iterator itr;
     };
 
-    struct BlockHeader_ {
+    struct BlockHeader {
         void* data;
         void* next;
         long size;
@@ -38,13 +38,13 @@ public:
         int line;
     };
 
-    std::list<struct ChunkHeader_*> chunks_;
-    void* blocks_[NUM_BLOCK];
-    long blockSizes_[NUM_BLOCK];
+    std::list<struct ChunkHeader*> chunks;
+    void* blocks[NUM_BLOCK];
+    long blockSizes[NUM_BLOCK];
 
-    void* AllocChunk_(long blockSize, int blockNum);
-    void FreeChunk_(struct ChunkHeader_* ch);
-    void FreeChunkList_();
+    void* AllocChunk(long blockSize, int blockNum);
+    void FreeChunk(struct ChunkHeader* ch);
+    void FreeChunkList();
 };
 
 extern DAGGER_API DMemPool* GpMemPool;

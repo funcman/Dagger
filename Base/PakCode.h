@@ -4,10 +4,10 @@
 #include "TypeDef.h"
 
 struct DPakCodeInfo {
-    BYTE* dataBuf_;
-    DWORD dataLen_;
-    BYTE* packBuf_;
-    DWORD packLen_;
+    BYTE* dataBuf;
+    DWORD dataLen;
+    BYTE* packBuf;
+    DWORD packLen;
 };
 
 class DAGGER_API DPakCode {

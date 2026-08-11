@@ -1,5 +1,7 @@
 #include "CsvFile.h"
 
+#include <string.h>
+
 #include "BinFile.h"
 #include "Debug.h"
 #include "MemPool.h"

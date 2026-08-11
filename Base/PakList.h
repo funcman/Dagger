@@ -14,7 +14,7 @@ public:
     DPakNode* Find(char const* fileName, DPakIndex* index);
     void Free();
 
-    DList patchList_;
+    DList patchList;
 };
 
 extern DAGGER_API DPakList* GpPakList;

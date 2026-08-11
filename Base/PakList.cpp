@@ -27,7 +27,7 @@ bool DPakList::Patch(char const* fileName) {
     DPakNode* node = (DPakNode*)DCAlloc(sizeof(DPakNode));
     node->Init();
     if (node->Open(fileName)) {
-        patchList_.AddHead(node);
+        patchList.AddHead(node);
         return true;
     }
     DFree(node);
@@ -35,7 +35,7 @@ bool DPakList::Patch(char const* fileName) {
 }
 
 DPakNode* DPakList::Find(char const* fileName, DPakIndex* index) {
-    DPakNode* node = (DPakNode*)patchList_.GetHead();
+    DPakNode* node = (DPakNode*)patchList.GetHead();
     while (node) {
         if (node->Find(fileName, index))
             return node;
@@ -54,7 +54,7 @@ DPakNode* DPakList::Find(char const* fileName, DPakIndex* index) {
 }
 
 void DPakList::Free() {
-    DPakNode* node = (DPakNode*)patchList_.RemoveHead();
+    DPakNode* node = (DPakNode*)patchList.RemoveHead();
     while (node) {
         node->Free();
         node->Delete();

@@ -33,30 +33,30 @@ bool DPakPack::Pack(char const* inFile, char const* outFile) {
     if (size == DFILE_SEEK_ERROR || size <= sizeof(DPakSingleHead))
         return false;
 
-    info.dataLen_ = size;
-    info.packLen_ = GpPakCode->GetPackLen(info.dataLen_);
-    if (!dataBuf.Alloc(info.dataLen_))
+    info.dataLen = size;
+    info.packLen = GpPakCode->GetPackLen(info.dataLen);
+    if (!dataBuf.Alloc(info.dataLen))
         return false;
-    if (!packBuf.Alloc(info.packLen_))
+    if (!packBuf.Alloc(info.packLen))
         return false;
 
-    file.Read(dataBuf.GetMemPtr(), info.dataLen_);
+    file.Read(dataBuf.GetMemPtr(), info.dataLen);
     file.Close();
 
     if (!file.Create(outFile))
         return false;
 
-    info.dataBuf_ = (BYTE*)dataBuf.GetMemPtr();
-    info.packBuf_ = (BYTE*)packBuf.GetMemPtr();
+    info.dataBuf = (BYTE*)dataBuf.GetMemPtr();
+    info.packBuf = (BYTE*)packBuf.GetMemPtr();
     GpPakCode->Encode(&info);
 
     DPakSingleHead header;
     header.magicId = PAK_MAGIC;
-    header.fileLen = info.dataLen_;
-    header.packLen = info.packLen_;
+    header.fileLen = info.dataLen;
+    header.packLen = info.packLen;
     header.notUsed = 0;
     file.Write(&header, sizeof(header));
-    file.Write(packBuf.GetMemPtr(), info.packLen_);
+    file.Write(packBuf.GetMemPtr(), info.packLen);
     file.Close();
     return true;
 }
@@ -78,23 +78,23 @@ bool DPakPack::UnPack(char const* inFile, char const* outFile) {
     if (header.magicId != PAK_MAGIC)
         return false;
 
-    info.packLen_ = header.packLen;
-    info.dataLen_ = header.fileLen;
-    if (!packBuf.Alloc(info.packLen_))
+    info.packLen = header.packLen;
+    info.dataLen = header.fileLen;
+    if (!packBuf.Alloc(info.packLen))
         return false;
-    if (!dataBuf.Alloc(info.dataLen_))
+    if (!dataBuf.Alloc(info.dataLen))
         return false;
 
-    file.Read(packBuf.GetMemPtr(), info.packLen_);
+    file.Read(packBuf.GetMemPtr(), info.packLen);
     file.Close();
 
     if (!file.Create(outFile))
         return false;
 
-    info.dataBuf_ = (BYTE*)dataBuf.GetMemPtr();
-    info.packBuf_ = (BYTE*)packBuf.GetMemPtr();
+    info.dataBuf = (BYTE*)dataBuf.GetMemPtr();
+    info.packBuf = (BYTE*)packBuf.GetMemPtr();
     GpPakCode->Decode(&info);
-    file.Write(dataBuf.GetMemPtr(), info.dataLen_);
+    file.Write(dataBuf.GetMemPtr(), info.dataLen);
     file.Close();
     return true;
 }

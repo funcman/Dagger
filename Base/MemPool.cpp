@@ -13,39 +13,39 @@ DMemPool::DMemPool() {
     DDebugLog("GpMemPool ready.");
     // init blocks
     for (int i = 0; i < NUM_BLOCK; ++i) {
-        blockSizes_[i] = (1 << (MIN_BLOCK + i));
+        blockSizes[i] = (1 << (MIN_BLOCK + i));
     }
-    memset(blocks_, 0, sizeof(blocks_));
+    memset(blocks, 0, sizeof(blocks));
 }
 
 DMemPool::~DMemPool() {
-    FreeChunkList_();
+    FreeChunkList();
     GpMemPool = 0;
 }
 
-void* DMemPool::AllocChunk_(long blockSize, int blockNum) {
-    blockSize = blockSize + sizeof(struct BlockHeader_);
-    long chunkSize = sizeof(struct ChunkHeader_) + (blockSize * blockNum);
+void* DMemPool::AllocChunk(long blockSize, int blockNum) {
+    blockSize = blockSize + sizeof(struct BlockHeader);
+    long chunkSize = sizeof(struct ChunkHeader) + (blockSize * blockNum);
     unsigned char* c = (unsigned char*)calloc(chunkSize, sizeof(unsigned char));
     if (!c) {
-        DDebugLog("DMemPool::AllocChunk_() Fail, size=%ld, num=%d", blockSize, blockNum);
+        DDebugLog("DMemPool::AllocChunk() Fail, size=%ld, num=%d", blockSize, blockNum);
         return 0;
     }
 
     // init chunk header
-    struct ChunkHeader_* ch = (struct ChunkHeader_*)c;
+    struct ChunkHeader* ch = (struct ChunkHeader*)c;
     ch->blockNum = blockNum;
     ch->blockSize = blockSize;
-    chunks_.push_front(ch);
-    ch->itr = chunks_.begin();
+    chunks.push_front(ch);
+    ch->itr = chunks.begin();
 
     // init block header
-    unsigned char* f = c + sizeof(struct ChunkHeader_);
+    unsigned char* f = c + sizeof(struct ChunkHeader);
     unsigned char* p = c + chunkSize;
     unsigned char* n = 0;
     while (p > f) {
         p -= blockSize;
-        struct BlockHeader_* bh = (struct BlockHeader_*)p;
+        struct BlockHeader* bh = (struct BlockHeader*)p;
         bh->data = 0;
         bh->next = (void*)n;
         bh->size = 0;
@@ -56,61 +56,61 @@ void* DMemPool::AllocChunk_(long blockSize, int blockNum) {
     return f;
 }
 
-void DMemPool::FreeChunk_(struct ChunkHeader_* ch) {
-    chunks_.erase(ch->itr);
+void DMemPool::FreeChunk(struct ChunkHeader* ch) {
+    chunks.erase(ch->itr);
     ::free(ch);
 }
 
-void DMemPool::FreeChunkList_() {
-    while (!chunks_.empty()) {
-        struct ChunkHeader_* ch = chunks_.front();
-        unsigned char* bp = ((unsigned char*)ch) + sizeof(struct ChunkHeader_);
+void DMemPool::FreeChunkList() {
+    while (!chunks.empty()) {
+        struct ChunkHeader* ch = chunks.front();
+        unsigned char* bp = ((unsigned char*)ch) + sizeof(struct ChunkHeader);
         for (int i = 0; i < ch->blockNum; ++i) {
-            struct BlockHeader_* bh = (struct BlockHeader_*)bp;
+            struct BlockHeader* bh = (struct BlockHeader*)bp;
             if (bh->size != 0) {
                 DDebugLog("DMemPool Find Leak, File=\"%s\", Line=%d, Size=%d", bh->file, bh->line, bh->size);
             }
             bp += ch->blockSize;
         }
-        FreeChunk_(ch);
+        FreeChunk(ch);
     }
 }
 
 void* DMemPool::Alloc(long size, char const* file, int line) {
     unsigned char* p = 0;
     if (size > (1 << MAX_BLOCK)) {  // >1K
-        p = (unsigned char*)AllocChunk_(size, 1);
+        p = (unsigned char*)AllocChunk(size, 1);
         if (p) {
-            struct BlockHeader_* bh = (struct BlockHeader_*)p;
-            bh->data = p + sizeof(struct BlockHeader_);
+            struct BlockHeader* bh = (struct BlockHeader*)p;
+            bh->data = p + sizeof(struct BlockHeader);
             bh->next = (void*)-1L;  // single block
             bh->size = size;
             bh->file = file;
             bh->line = line;
-            p += sizeof(struct BlockHeader_);
+            p += sizeof(struct BlockHeader);
         }
     } else {
         // find right size chunk
         long i, mask;
         for (i = 0; i < NUM_BLOCK - 1; ++i) {
-            mask = ~(blockSizes_[i] - 1);
+            mask = ~(blockSizes[i] - 1);
             if ((size & mask) == 0) {
                 break;
             }
         }
-        if (0 == blocks_[i]) {
-            blocks_[i] = AllocChunk_(blockSizes_[i], CHUNK_SIZE / blockSizes_[i]);
+        if (0 == blocks[i]) {
+            blocks[i] = AllocChunk(blockSizes[i], CHUNK_SIZE / blockSizes[i]);
         }
-        p = (unsigned char*)blocks_[i];
+        p = (unsigned char*)blocks[i];
         if (p) {
-            struct BlockHeader_* bh = (struct BlockHeader_*)p;
-            blocks_[i] = bh->next;
-            bh->data = p + sizeof(struct BlockHeader_);
+            struct BlockHeader* bh = (struct BlockHeader*)p;
+            blocks[i] = bh->next;
+            bh->data = p + sizeof(struct BlockHeader);
             bh->next = (void*)(intptr_t)i;
             bh->size = size;
             bh->file = file;
             bh->line = line;
-            p += sizeof(struct BlockHeader_);
+            p += sizeof(struct BlockHeader);
         }
     }
     // zero clearing
@@ -124,7 +124,7 @@ void DMemPool::Free(void* mem, char const* file, int line) {
     }
     // check block
     unsigned char* pc = (unsigned char*)mem;
-    struct BlockHeader_* bh = (struct BlockHeader_*)(pc - sizeof(struct BlockHeader_));
+    struct BlockHeader* bh = (struct BlockHeader*)(pc - sizeof(struct BlockHeader));
     if (bh->data != mem) {
         DDebugLog("DMemPool::Free() Fail, File=%s, Line=%s", file, line);
         return;
@@ -133,31 +133,31 @@ void DMemPool::Free(void* mem, char const* file, int line) {
     memset(pc, 0, bh->size);
     // single block
     if (bh->next == (void*)-1LL) {
-        struct ChunkHeader_* ch = (struct ChunkHeader_*)(((unsigned char*)bh) - sizeof(struct ChunkHeader_));
+        struct ChunkHeader* ch = (struct ChunkHeader*)(((unsigned char*)bh) - sizeof(struct ChunkHeader));
         bh->size = 0;
-        FreeChunk_(ch);
+        FreeChunk(ch);
     } else {
         long i = (long)(intptr_t)bh->next;
-        struct BlockHeader_* next = (struct BlockHeader_*)blocks_[i];
-        blocks_[i] = bh;
+        struct BlockHeader* next = (struct BlockHeader*)blocks[i];
+        blocks[i] = bh;
         bh->next = next;
         bh->size = 0;
     }
 }
 
 long DMemPool::size() {
-    struct ChunkHeader_* ch;
-    struct BlockHeader_* bh;
+    struct ChunkHeader* ch;
+    struct BlockHeader* bh;
     unsigned char* bp;
     long size = 0;
     for (
-        std::list<struct ChunkHeader_*>::iterator itr = chunks_.begin();
-        itr != chunks_.end();
+        std::list<struct ChunkHeader*>::iterator itr = chunks.begin();
+        itr != chunks.end();
         ++itr) {
         ch = *itr;
-        bp = ((unsigned char*)ch) + sizeof(struct ChunkHeader_);
+        bp = ((unsigned char*)ch) + sizeof(struct ChunkHeader);
         for (int i = 0; i < ch->blockNum; ++i) {
-            bh = (struct BlockHeader_*)bp;
+            bh = (struct BlockHeader*)bp;
             size += bh->size;
             bp += ch->blockSize;
         }
@@ -167,10 +167,10 @@ long DMemPool::size() {
 
 void DMemPool::FreeAll() {
     for (
-        std::list<struct ChunkHeader_*>::iterator itr = chunks_.begin();
-        itr != chunks_.end();
+        std::list<struct ChunkHeader*>::iterator itr = chunks.begin();
+        itr != chunks.end();
         ++itr) {
-        FreeChunk_(*itr);
+        FreeChunk(*itr);
     }
-    memset(blocks_, 0, sizeof(blocks_));
+    memset(blocks, 0, sizeof(blocks));
 }

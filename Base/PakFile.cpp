@@ -33,10 +33,10 @@ bool DPakFile::Open(char const* fileName) {
     case DPAK_DISK_FIRST:
         ok = file_.Open(fileName);
         if (!ok)
-            ok = OpenPack(fileName);
+            ok = OpenPack_(fileName);
         break;
     case DPAK_PACK_FIRST:
-        ok = OpenPack(fileName);
+        ok = OpenPack_(fileName);
         if (!ok)
             ok = file_.Open(fileName);
         break;
@@ -48,7 +48,7 @@ DWORD DPakFile::Read(void* buffer, DWORD size) {
     if (size == 0)
         return 0;
     if (pakNode_) {
-        size = ReadPack(buffer, size);
+        size = ReadPack_(buffer, size);
     } else {
         return file_.Read(buffer, size);
     }
@@ -57,7 +57,7 @@ DWORD DPakFile::Read(void* buffer, DWORD size) {
 
 DWORD DPakFile::Seek(long offset, DWORD method) {
     if (pakNode_) {
-        offset = SeekPack(offset, method);
+        offset = SeekPack_(offset, method);
     } else {
         return file_.Seek(offset, method);
     }
@@ -83,7 +83,7 @@ void DPakFile::Close() {
     pakNode_ = nullptr;
 }
 
-bool DPakFile::OpenPack(char const* fileName) {
+bool DPakFile::OpenPack_(char const* fileName) {
     if (!GpPakList)
         return false;
     if (!fileName || !fileName[0])
@@ -117,7 +117,7 @@ bool DPakFile::OpenPack(char const* fileName) {
     return true;
 }
 
-DWORD DPakFile::ReadPack(void* buffer, DWORD size) {
+DWORD DPakFile::ReadPack_(void* buffer, DWORD size) {
     UINT block = 0;
     DWORD readSize = 0;
     DWORD blockPos = 0;
@@ -150,7 +150,7 @@ DWORD DPakFile::ReadPack(void* buffer, DWORD size) {
     }
 
     while (size > 0xffff) {
-        ReadBlock(outBuf, block);
+        ReadBlock_(outBuf, block);
         outBuf += BLOCK_SIZE;
         dataPtr_ += (blockSizes_[block] == 0) ? BLOCK_SIZE : blockSizes_[block];
         filePtr_ = (++block) << 16;
@@ -160,13 +160,13 @@ DWORD DPakFile::ReadPack(void* buffer, DWORD size) {
     if (size == 0)
         return readSize;
 
-    ReadBlock(buffer_, block);
+    ReadBlock_(buffer_, block);
     memcpy(outBuf, buffer_, size);
     filePtr_ += size;
     return readSize;
 }
 
-DWORD DPakFile::SeekPack(long offset, DWORD method) {
+DWORD DPakFile::SeekPack_(long offset, DWORD method) {
     if (!pakNode_)
         return file_.Seek(offset, method);
 
@@ -198,7 +198,7 @@ DWORD DPakFile::SeekPack(long offset, DWORD method) {
         dataPtr_ += (blockSizes_[i] == 0) ? BLOCK_SIZE : blockSizes_[i];
     }
     if (filePtr & 0xffff) {
-        ReadBlock(buffer_, fullBlocks);
+        ReadBlock_(buffer_, fullBlocks);
     }
     return filePtr_;
 }
@@ -216,38 +216,38 @@ bool DPakFile::Save(char const* fileName) {
     dataPtr_ = fileOfs_;
 
     while (size > BLOCK_SIZE) {
-        ReadBlock(buffer_, block);
+        ReadBlock_(buffer_, block);
         size -= BLOCK_SIZE;
         file_.Write(buffer_, BLOCK_SIZE);
         dataPtr_ += (blockSizes_[block] == 0) ? BLOCK_SIZE : blockSizes_[block];
         block++;
     }
 
-    ReadBlock(buffer_, block);
+    ReadBlock_(buffer_, block);
     file_.Write(buffer_, size);
     file_.Close();
     return true;
 }
 
-void DPakFile::ReadBlock(BYTE* buf, int block) {
+void DPakFile::ReadBlock_(BYTE* buf, int block) {
     DPakCodeInfo info;
-    info.packBuf_ = (BYTE*)memRead_.GetMemPtr();
-    info.packLen_ = blockSizes_[block];
-    info.dataBuf_ = buf;
-    info.dataLen_ = BLOCK_SIZE;
+    info.packBuf = (BYTE*)memRead_.GetMemPtr();
+    info.packLen = blockSizes_[block];
+    info.dataBuf = buf;
+    info.dataLen = BLOCK_SIZE;
 
-    if (info.packLen_ == 0) {
+    if (info.packLen == 0) {
         pakNode_->Seek(dataPtr_, DFILE_BEGIN);
-        pakNode_->Read(info.dataBuf_, info.dataLen_);
+        pakNode_->Read(info.dataBuf, info.dataLen);
         return;
     }
 
     if (block == (blocks_ - 1)) {
-        info.dataLen_ = fileLen_ - block * BLOCK_SIZE;
+        info.dataLen = fileLen_ - block * BLOCK_SIZE;
     }
 
     pakNode_->Seek(dataPtr_, DFILE_BEGIN);
-    pakNode_->Read(info.packBuf_, info.packLen_);
+    pakNode_->Read(info.packBuf, info.packLen);
     pakNode_->Lock();
     GpPakCode->Decode(&info);
     pakNode_->Unlock();

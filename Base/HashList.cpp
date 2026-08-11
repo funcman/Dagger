@@ -10,15 +10,15 @@ struct HashNode : public DNode {
 };
 
 void DNameNode::SetName(char const* name) {
-    DStrLCopy(name_, name, 79);
-    name_[79] = 0;
+    DStrLCopy(this->name, name, 79);
+    this->name[79] = 0;
 }
 
 void DNameNode::Remove() {
-    if (hashNode_) {
-        hashNode_->Remove();
-        DFree(hashNode_);
-        hashNode_ = nullptr;
+    if (hashNode) {
+        hashNode->Remove();
+        DFree(hashNode);
+        hashNode = nullptr;
     }
     DNode::Remove();
 }
@@ -42,8 +42,8 @@ void DHashList::Free() {
 void DHashList::AddHead(DNameNode* node) {
     HashNode* hashNode = (HashNode*)DCAlloc(sizeof(HashNode));
     hashNode->node = node;
-    node->hashNode_ = hashNode;
-    int i = HashKey(node->name_) % DHASH_SIZE;
+    node->hashNode = hashNode;
+    int i = HashKey(node->name) % DHASH_SIZE;
     buckets_[i].AddTail(hashNode);
     DList::AddHead(node);
 }
@@ -51,16 +51,16 @@ void DHashList::AddHead(DNameNode* node) {
 void DHashList::AddTail(DNameNode* node) {
     HashNode* hashNode = (HashNode*)DCAlloc(sizeof(HashNode));
     hashNode->node = node;
-    node->hashNode_ = hashNode;
-    int i = HashKey(node->name_) % DHASH_SIZE;
+    node->hashNode = hashNode;
+    int i = HashKey(node->name) % DHASH_SIZE;
     buckets_[i].AddTail(hashNode);
     DList::AddTail(node);
 }
 
 void DHashList::Changed(DNameNode* node) {
-    node->hashNode_->Remove();
-    int i = HashKey(node->name_) % DHASH_SIZE;
-    buckets_[i].AddTail(node->hashNode_);
+    node->hashNode->Remove();
+    int i = HashKey(node->name) % DHASH_SIZE;
+    buckets_[i].AddTail(node->hashNode);
 }
 
 DNameNode* DHashList::RemoveHead() {
@@ -84,7 +84,7 @@ DNameNode* DHashList::FindName(char const* name) {
     DNode* p = buckets_[i].GetHead();
     while (p) {
         HashNode* hashNode = (HashNode*)p;
-        if (strcmp(hashNode->node->name_, name) == 0) {
+        if (strcmp(hashNode->node->name, name) == 0) {
             return hashNode->node;
         }
         p = p->GetNext();

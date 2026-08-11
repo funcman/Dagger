@@ -7,12 +7,12 @@
 
 class DIniKeyNode : public DNameNode {
 public:
-    char* value_;
+    char* value;
 };
 
 class DIniSecNode : public DNameNode {
 public:
-    DHashList keyList_;
+    DHashList keyList;
 };
 
 class DIniFile : public DHashList {
@@ -44,10 +44,10 @@ public:
     void SetInt(char const* section, char const* key, long val);
 
 private:
-    DWORD GetSaveSize();
-    void InitList(char* buffer, long len);
-    bool IsKeyChar(BYTE c);
-    char* SplitKeyValue(char* str);
+    DWORD GetSaveSize_();
+    void InitList_(char* buffer, long len);
+    bool IsKeyChar_(BYTE c);
+    char* SplitKeyValue_(char* str);
 };
 
 #endif//DAGGER_INIFILE_H
