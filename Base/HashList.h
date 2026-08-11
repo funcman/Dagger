@@ -7,7 +7,7 @@
 const int DHASH_SIZE = 100;
 
 class DNameNode : public DNode {
-   public:
+public:
     char name_[80];
     DNode* hashNode_;
     void SetName(char const* name);
@@ -16,7 +16,7 @@ class DNameNode : public DNode {
 };
 
 class DHashList : public DList {
-   public:
+public:
     ~DHashList();
     void Free();
     void AddHead(DNameNode* node);
@@ -27,7 +27,7 @@ class DHashList : public DList {
     DNameNode* FindName(char const* name);
     UINT HashKey(char const* name);
 
-   private:
+private:
     DList buckets_[DHASH_SIZE];
 };
 

@@ -14,7 +14,7 @@ const int NUM_BLOCK = ((MAX_BLOCK - MIN_BLOCK) + 1);
 const int CHUNK_SIZE = 16 * 1024;  // chunk size is 16kb
 
 class DMemPool {
-   public:
+public:
     DMemPool();
     ~DMemPool();
 
@@ -23,7 +23,7 @@ class DMemPool {
     long size();
     void FreeAll();
 
-   private:
+public:
     struct ChunkHeader_ {
         long blockNum;
         long blockSize;

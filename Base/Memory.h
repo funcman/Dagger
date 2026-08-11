@@ -4,11 +4,11 @@
 #include "TypeDef.h"
 
 class DMemory {
-   private:
+public:
     void* memPtr_;
     DWORD memLen_;
 
-   public:
+public:
     DMemory();
     ~DMemory();
     void* Alloc(DWORD size);

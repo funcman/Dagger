@@ -10,7 +10,7 @@ class DAGGER_API DList {
     DNode head_;
     DNode tail_;
 
-   public:
+public:
     DList();
     ~DList();
     void Init();

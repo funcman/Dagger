@@ -20,14 +20,14 @@ typedef struct {
 } DClipper;
 
 class DCanvas {
-   public:
+public:
     void* frameBuffer;
     long width;
     long height;
     long pitch;
     DRect rect;
 
-   public:
+public:
     DCanvas(int w, int h, void* scr);
     ~DCanvas();
 

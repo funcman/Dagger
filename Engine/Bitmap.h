@@ -12,7 +12,7 @@ void DDrawBitmap16Mmx(int nX, int nY, int nWidth, int nHeight, void* pBitmap);
 void DDrawBitmap16Rev(int nX, int nY, int nWidth, int nHeight, void* pBitmap);
 
 class DBitmap {
-   public:
+public:
     DMemory bitmap;
     DMemory pal32;
     DMemory pal16;
@@ -21,7 +21,7 @@ class DBitmap {
     long bpp;
     long colors;
 
-   public:
+public:
     DBitmap();
     bool New(int width, int height, int bpp);
     void Fill(BYTE fill);
