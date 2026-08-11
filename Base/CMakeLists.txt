@@ -7,6 +7,7 @@ add_library(DBase SHARED
     HashList.cpp
     Md5.cpp
     System.cpp
+    Timer.cpp
     BinFile.cpp
     CsvFile.cpp
     IniFile.cpp
