@@ -24,4 +24,9 @@ if (NOT EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/3rd/SDL3/CMakeLists.txt)
 endif()
 add_subdirectory(3rd/SDL3)
 
+if (TARGET SDL3::SDL3)
+    target_link_libraries(DBase PRIVATE SDL3::SDL3)
+    target_compile_definitions(DBase PRIVATE DAGGER_HAS_SDL3)
+endif()
+
 add_subdirectory(Client)

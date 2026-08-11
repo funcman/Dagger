@@ -3,6 +3,7 @@
 #include <SDL3/SDL.h>
 
 #include "Debug.h"
+#include "System.h"
 
 Screen::Screen(int width, int height, char const* title)
     : width_(width), height_(height), title_(title), window_(0), renderer_(0), texture_(0) {
@@ -18,6 +19,9 @@ Screen::Screen(int width, int height, char const* title)
         DDebugLog("SDL_CreateWindow failed: %s", SDL_GetError());
         return;
     }
+#if defined(DAGGER_HAS_SDL3)
+    GpSdlWindow = window_;
+#endif
 
     // macOS: use the OpenGL backend. The Metal renderer (and SDL's software
     // fallback) synchronize SDL_RenderPresent to the display refresh rate on
@@ -51,6 +55,9 @@ Screen::Screen(int width, int height, char const* title)
 }
 
 Screen::~Screen() {
+#if defined(DAGGER_HAS_SDL3)
+    GpSdlWindow = nullptr;
+#endif
     if (texture_) {
         SDL_DestroyTexture(texture_);
     }
