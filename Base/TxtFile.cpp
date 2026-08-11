@@ -13,14 +13,18 @@ DTxtFile::~DTxtFile() {
 }
 
 bool DTxtFile::Open(char const* fileName) {
-    if (!fileName || !fileName[0]) return false;
+    if (!fileName || !fileName[0])
+        return false;
     Close();
     DPakFile file;
-    if (!file.Open(fileName)) return false;
+    if (!file.Open(fileName))
+        return false;
     DWORD size = file.Size();
-    if (size == DFILE_SEEK_ERROR) return false;
+    if (size == DFILE_SEEK_ERROR)
+        return false;
     memFile_.Alloc(size + 2);
-    if (size > 0) file.Read(memFile_.GetMemPtr(), size);
+    if (size > 0)
+        file.Read(memFile_.GetMemPtr(), size);
     size_ = size;
     ReadAllLines();
     return true;
@@ -29,7 +33,8 @@ bool DTxtFile::Open(char const* fileName) {
 void DTxtFile::OpenMem(void* buffer, DWORD length) {
     Close();
     memFile_.Alloc(length + 2);
-    if (buffer && length > 0) memcpy(memFile_.GetMemPtr(), buffer, length);
+    if (buffer && length > 0)
+        memcpy(memFile_.GetMemPtr(), buffer, length);
     size_ = length;
     ReadAllLines();
 }
@@ -79,7 +84,8 @@ char* DTxtFile::FirstLine() {
 }
 
 char* DTxtFile::NextLine() {
-    if (!currLine_) return nullptr;
+    if (!currLine_)
+        return nullptr;
     currLine_ = (DTxtLine*)currLine_->GetNext();
     return currLine_ ? currLine_->line_ : nullptr;
 }

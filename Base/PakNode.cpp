@@ -29,22 +29,31 @@ bool DPakNode::Open(char const* fileName) {
     DPakCodeInfo code;
     DWORD magic;
 
-    if (fileNum_) Close();
+    if (fileNum_)
+        Close();
 
-    if (!zipFile_.Open(fileName)) return false;
+    if (!zipFile_.Open(fileName))
+        return false;
 
-    if (zipFile_.Read(&header, sizeof(header)) != sizeof(header)) return false;
+    if (zipFile_.Read(&header, sizeof(header)) != sizeof(header))
+        return false;
 
-    if (header.magicCode != 0x12345678) return false;
+    if (header.magicCode != 0x12345678)
+        return false;
 
     fileNum_ = header.fileNumber;
 
     zipFile_.Seek(header.fileOffset, DFILE_BEGIN);
-    if (zipFile_.Read(&magic, sizeof(DWORD)) != sizeof(DWORD)) return false;
-    if (magic != 0x55AA55AA) return false;
-    if (zipFile_.Read(&code.packLen_, sizeof(DWORD)) != sizeof(DWORD)) return false;
-    if (zipFile_.Read(&code.dataLen_, sizeof(DWORD)) != sizeof(DWORD)) return false;
-    if (code.dataLen_ != fileNum_ * sizeof(DPakIndex)) return false;
+    if (zipFile_.Read(&magic, sizeof(DWORD)) != sizeof(DWORD))
+        return false;
+    if (magic != 0x55AA55AA)
+        return false;
+    if (zipFile_.Read(&code.packLen_, sizeof(DWORD)) != sizeof(DWORD))
+        return false;
+    if (zipFile_.Read(&code.dataLen_, sizeof(DWORD)) != sizeof(DWORD))
+        return false;
+    if (code.dataLen_ != fileNum_ * sizeof(DPakIndex))
+        return false;
     code.packBuf_ = (BYTE*)DCAlloc(code.packLen_);
     if (zipFile_.Read(code.packBuf_, code.packLen_) != code.packLen_) {
         DFree(code.packBuf_);
@@ -78,7 +87,8 @@ void DPakNode::Close() {
 bool DPakNode::Find(char const* fileName, DPakIndex* index) {
     char pathName[DMAX_PATH];
 
-    if (fileNum_ <= 0) return false;
+    if (fileNum_ <= 0)
+        return false;
     DPakIndex* entries = (DPakIndex*)zipOffs_.GetMemPtr();
     DPathGetHalf(pathName, fileName);
     DWORD id = DHashString(pathName);

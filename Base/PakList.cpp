@@ -37,7 +37,8 @@ bool DPakList::Patch(char const* fileName) {
 DPakNode* DPakList::Find(char const* fileName, DPakIndex* index) {
     DPakNode* node = (DPakNode*)patchList_.GetHead();
     while (node) {
-        if (node->Find(fileName, index)) return node;
+        if (node->Find(fileName, index))
+            return node;
         node = (DPakNode*)node->GetNext();
     }
     node = (DPakNode*)GetHead();

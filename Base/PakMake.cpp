@@ -42,14 +42,17 @@ bool DPakMake::Pack(char const* listFile, char const* packFile) {
     int nFileNum = 0;
     int nBlock = 0;
 
-    if (!GpPakCode) return false;
+    if (!GpPakCode)
+        return false;
 
     DTxtFile textFile;
     DPathSetCurrent((char*)"/");
-    if (!textFile.Open(listFile)) return false;
+    if (!textFile.Open(listFile))
+        return false;
 
     nFileNum = textFile.GetLineCount() - 1;
-    if (nFileNum == 0) return false;
+    if (nFileNum == 0)
+        return false;
 
     pFileList = (DPakFileList*)DCAlloc(sizeof(DPakFileList) * nFileNum);
     pOffsList = (DPakOffsList*)DCAlloc(sizeof(DPakOffsList) * nFileNum);
@@ -190,7 +193,8 @@ bool DPakMake::Pack(char const* listFile, char const* packFile) {
     DPathChangeExt(szListFile, ".dir");
     DPathSetCurrent((char*)"/");
     DBinFile dirFile;
-    if (!dirFile.Open(szListFile)) return false;
+    if (!dirFile.Open(szListFile))
+        return false;
     info.dataLen_ = dirFile.Size();
     info.dataBuf_ = (BYTE*)DCAlloc(info.dataLen_);
     info.packLen_ = GpPakCode->GetPackLen(info.dataLen_);
@@ -209,7 +213,8 @@ bool DPakMake::Pack(char const* listFile, char const* packFile) {
     DPathChangeExt(szListFile, ".txt");
     DPathSetCurrent((char*)"/");
     DBinFile txtFile;
-    if (!txtFile.Open(szListFile)) return false;
+    if (!txtFile.Open(szListFile))
+        return false;
     info.dataLen_ = txtFile.Size();
     info.dataBuf_ = (BYTE*)DCAlloc(info.dataLen_);
     info.packLen_ = GpPakCode->GetPackLen(info.dataLen_);
@@ -232,14 +237,16 @@ bool DPakMake::Pack(char const* listFile, char const* packFile) {
 }
 
 bool DPakMake::UnPack(char const* datFile, char const* outPath) {
-    if (!GpPakCode) return false;
+    if (!GpPakCode)
+        return false;
 
     DPakFile packFile;
     char szPathName[DMAX_PATH];
     DWORD magic = 0;
 
     DSetPakFileMode(DPAK_DISK_FIRST);
-    if (!packFile.Open(datFile)) return false;
+    if (!packFile.Open(datFile))
+        return false;
 
     DPakHead header;
     packFile.Read(&header, sizeof(header));
@@ -247,7 +254,8 @@ bool DPakMake::UnPack(char const* datFile, char const* outPath) {
 
     DPakCodeInfo info;
     packFile.Read(&magic, sizeof(DWORD));
-    if (magic != ZIP_MAGIC) return false;
+    if (magic != ZIP_MAGIC)
+        return false;
     packFile.Read(&info.packLen_, sizeof(DWORD));
     packFile.Read(&info.dataLen_, sizeof(DWORD));
 
@@ -272,7 +280,8 @@ bool DPakMake::UnPack(char const* datFile, char const* outPath) {
     }
 
     packFile.Read(&magic, sizeof(DWORD));
-    if (magic != ZIP_MAGIC) return false;
+    if (magic != ZIP_MAGIC)
+        return false;
     packFile.Read(&info.packLen_, sizeof(DWORD));
     packFile.Read(&info.dataLen_, sizeof(DWORD));
 

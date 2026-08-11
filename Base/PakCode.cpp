@@ -21,12 +21,15 @@ struct DLibHandle {
 };
 static DLibHandle* DLibOpen(char const* path) {
     SDL_SharedObject* obj = SDL_LoadObject(path);
-    if (!obj) return nullptr;
+    if (!obj)
+        return nullptr;
     return new DLibHandle{obj};
 }
 static void DLibClose(DLibHandle* h) {
-    if (!h) return;
-    if (h->obj) SDL_UnloadObject(h->obj);
+    if (!h)
+        return;
+    if (h->obj)
+        SDL_UnloadObject(h->obj);
     delete h;
 }
 static void* DLibSym(DLibHandle* h, char const* name) {
@@ -38,12 +41,15 @@ struct DLibHandle {
 };
 static DLibHandle* DLibOpen(char const* path) {
     HMODULE obj = LoadLibraryA(path);
-    if (!obj) return nullptr;
+    if (!obj)
+        return nullptr;
     return new DLibHandle{obj};
 }
 static void DLibClose(DLibHandle* h) {
-    if (!h) return;
-    if (h->obj) FreeLibrary(h->obj);
+    if (!h)
+        return;
+    if (h->obj)
+        FreeLibrary(h->obj);
     delete h;
 }
 static void* DLibSym(DLibHandle* h, char const* name) {
@@ -55,12 +61,15 @@ struct DLibHandle {
 };
 static DLibHandle* DLibOpen(char const* path) {
     void* obj = dlopen(path, RTLD_NOW);
-    if (!obj) return nullptr;
+    if (!obj)
+        return nullptr;
     return new DLibHandle{obj};
 }
 static void DLibClose(DLibHandle* h) {
-    if (!h) return;
-    if (h->obj) dlclose(h->obj);
+    if (!h)
+        return;
+    if (h->obj)
+        dlclose(h->obj);
     delete h;
 }
 static void* DLibSym(DLibHandle* h, char const* name) {
@@ -79,7 +88,8 @@ DPakCode::~DPakCode() {
 }
 
 bool DPakCode::LoadLib(char const* fileName) {
-    if (handle_) return true;
+    if (handle_)
+        return true;
     char path[DMAX_PATH];
     DPathGetFull(path, fileName);
     DLibHandle* h = DLibOpen(path);
@@ -99,7 +109,8 @@ bool DPakCode::LoadLib(char const* fileName) {
 
 void DPakCode::FreeLib() {
     DLibHandle* h = (DLibHandle*)handle_;
-    if (h) DLibClose(h);
+    if (h)
+        DLibClose(h);
     handle_ = nullptr;
     encode_ = nullptr;
     decode_ = nullptr;

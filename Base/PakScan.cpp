@@ -36,14 +36,16 @@ void ScanDir(FILE* fileFp, FILE* pathFp, fs::path const& root, fs::path const& d
 
 bool DPakScan::Scan(char const* scanPath, char const* fileName) {
     fs::path root = fs::path(scanPath).lexically_normal();
-    if (!fs::exists(root) || !fs::is_directory(root)) return false;
+    if (!fs::exists(root) || !fs::is_directory(root))
+        return false;
 
     char pathName[DMAX_PATH];
     DStrLCopy(pathName, fileName, DMAX_PATH - 1);
     DPathChangeExt(pathName, ".dir");
 
     FILE* fileFp = fopen(fileName, "w+");
-    if (!fileFp) return false;
+    if (!fileFp)
+        return false;
     FILE* pathFp = fopen(pathName, "w+");
     if (!pathFp) {
         fclose(fileFp);

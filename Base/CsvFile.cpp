@@ -14,11 +14,14 @@ bool DCsvFile::Load(char const* fileName, DSep sep) {
     Free();
     sepChar_ = (sep == DSepSemicolon) ? ';' : (sep == DSepTab) ? '\t' : ',';
     DBinFile file;
-    if (!file.Open(fileName)) return false;
+    if (!file.Open(fileName))
+        return false;
     DWORD size = file.Size();
-    if (size == DFILE_SEEK_ERROR || size == 0) return false;
+    if (size == DFILE_SEEK_ERROR || size == 0)
+        return false;
     csvBuf_ = (char*)DCAlloc(size + 1);
-    if (!csvBuf_) return false;
+    if (!csvBuf_)
+        return false;
     file.Read(csvBuf_, size);
     csvBuf_[size] = 0;
 
@@ -62,7 +65,8 @@ bool DCsvFile::Load(char const* fileName, DSep sep) {
                 inQuote = true;  // opening quote
             } else if (c == '\n') {
                 csvBuf_[i] = 0;
-                if (i + 1 < size) rows_.push_back(&csvBuf_[i + 1]);
+                if (i + 1 < size)
+                    rows_.push_back(&csvBuf_[i + 1]);
             }
         }
     }
@@ -78,9 +82,11 @@ void DCsvFile::Free() {
 }
 
 bool DCsvFile::GetStr(int row, int col, char* buf) {
-    if (row < 0 || row >= (int)rows_.size() || !buf) return false;
+    if (row < 0 || row >= (int)rows_.size() || !buf)
+        return false;
     char* p = rows_[row];
-    if (!p) return false;
+    if (!p)
+        return false;
 
     bool inQuote = false;  // currently between opening " and closing "
     bool quoted = false;    // the current field started with "
@@ -110,7 +116,8 @@ bool DCsvFile::GetStr(int row, int col, char* buf) {
             p++;
         }
     }
-    if (col > 0) return false;
+    if (col > 0)
+        return false;
 
     // Copy phase: extract the column value into buf.
     while (p[0]) {

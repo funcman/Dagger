@@ -12,9 +12,11 @@ namespace {
 
 bool ExtMatch(char const* fileName, char const* ext) {
     const char* dot = strrchr(fileName, '.');
-    if (!dot) return false;
+    if (!dot)
+        return false;
     while (*dot && *ext) {
-        if (tolower((unsigned char)*dot) != tolower((unsigned char)*ext)) return false;
+        if (tolower((unsigned char)*dot) != tolower((unsigned char)*ext))
+            return false;
         ++dot;
         ++ext;
     }
@@ -29,7 +31,8 @@ void ScanDir(FILE* fileFp, FILE* pathFp, char const* prefix, fs::path const& dir
             fprintf(pathFp, "%s\n", newPrefix.c_str());
             ScanDir(fileFp, pathFp, newPrefix.c_str(), entry.path(), ext);
         } else {
-            if (ext && !ExtMatch(name.c_str(), ext)) continue;
+            if (ext && !ExtMatch(name.c_str(), ext))
+                continue;
             fprintf(fileFp, "%s\\%s\n", prefix, name.c_str());
         }
     }
@@ -44,14 +47,16 @@ DPakPath::DPakPath() {
 
 bool DPakPath::Scan(char const* scanPath, char const* fileName) {
     fs::path root = fs::path(scanPath).lexically_normal();
-    if (!fs::exists(root) || !fs::is_directory(root)) return false;
+    if (!fs::exists(root) || !fs::is_directory(root))
+        return false;
 
     char pathName[DMAX_PATH];
     DStrLCopy(pathName, fileName, DMAX_PATH - 1);
     DPathChangeExt(pathName, ".dir");
 
     FILE* fileFp = fopen(fileName, "w+");
-    if (!fileFp) return false;
+    if (!fileFp)
+        return false;
     FILE* pathFp = fopen(pathName, "w+");
     if (!pathFp) {
         fclose(fileFp);

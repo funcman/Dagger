@@ -13,14 +13,18 @@ DIniFile::~DIniFile() {
 }
 
 bool DIniFile::Load(char const* fileName) {
-    if (!fileName || !fileName[0]) return false;
+    if (!fileName || !fileName[0])
+        return false;
     Free();
     DBinFile file;
-    if (!file.Open(fileName)) return false;
+    if (!file.Open(fileName))
+        return false;
     DWORD size = file.Size();
-    if (size == DFILE_SEEK_ERROR) return false;
+    if (size == DFILE_SEEK_ERROR)
+        return false;
     char* buffer = (char*)DCAlloc(size + 4);
-    if (!buffer) return false;
+    if (!buffer)
+        return false;
     file.Read(buffer, size);
     buffer[size] = 0;
     InitList(buffer, (long)size);
@@ -29,10 +33,12 @@ bool DIniFile::Load(char const* fileName) {
 }
 
 bool DIniFile::Save(char const* fileName) {
-    if (!fileName || !fileName[0]) return false;
+    if (!fileName || !fileName[0])
+        return false;
     DWORD size = GetSaveSize();
     char* buffer = (char*)DCAlloc(size);
-    if (!buffer) return false;
+    if (!buffer)
+        return false;
     char* p = buffer;
     DWORD remaining = size;
     DIniSecNode* sec = (DIniSecNode*)GetHead();
@@ -55,7 +61,8 @@ bool DIniFile::Save(char const* fileName) {
     DWORD len = (DWORD)(p - buffer);
     DBinFile file;
     bool ok = file.Create(fileName);
-    if (ok) file.Write(buffer, len);
+    if (ok)
+        file.Write(buffer, len);
     DFree(buffer);
     return ok;
 }
@@ -128,12 +135,14 @@ void DIniFile::InitList(char* buffer, long len) {
         while (idx < len && buffer[idx]) {
             if (buffer[idx] == '\r') {
                 idx++;
-                if (idx < len && buffer[idx] == '\n') idx++;
+                if (idx < len && buffer[idx] == '\n')
+                    idx++;
                 break;
             }
             if (buffer[idx] == '\n') {
                 idx++;
-                if (idx < len && buffer[idx] == '\r') idx++;
+                if (idx < len && buffer[idx] == '\r')
+                    idx++;
                 break;
             }
             if (lineLen < 1023) {
@@ -150,7 +159,8 @@ void DIniFile::InitList(char* buffer, long len) {
                 i++;
             }
             section[i - 1] = 0;
-            if (i > 1) NewSection(section);
+            if (i > 1)
+                NewSection(section);
         } else if (IsKeyChar((BYTE)line[0])) {
             char* value = SplitKeyValue(line);
             if (value && value[0] && section[0]) {
@@ -177,7 +187,8 @@ char* DIniFile::SplitKeyValue(char* str) {
 
 DIniSecNode* DIniFile::NewSection(char const* section) {
     DIniSecNode* sec = FindSection(section);
-    if (sec) return sec;
+    if (sec)
+        return sec;
     sec = (DIniSecNode*)DCAlloc(sizeof(DIniSecNode));
     sec->SetName(section);
     AddTail(sec);
@@ -185,7 +196,8 @@ DIniSecNode* DIniFile::NewSection(char const* section) {
 }
 
 void DIniFile::FreeSection(DIniSecNode* sec) {
-    if (!sec) return;
+    if (!sec)
+        return;
     DIniKeyNode* key = (DIniKeyNode*)sec->keyList_.GetHead();
     while (key) {
         DIniKeyNode* next = (DIniKeyNode*)key->GetNext();
@@ -211,7 +223,8 @@ DIniSecNode* DIniFile::FirstSection() {
 DIniKeyNode* DIniFile::NewKey(char const* section, char const* key) {
     DIniSecNode* sec = NewSection(section);
     DIniKeyNode* k = FindKey(section, key);
-    if (k) return k;
+    if (k)
+        return k;
     k = (DIniKeyNode*)DCAlloc(sizeof(DIniKeyNode));
     k->SetName(key);
     sec->keyList_.AddTail(k);
@@ -220,20 +233,23 @@ DIniKeyNode* DIniFile::NewKey(char const* section, char const* key) {
 
 DIniKeyNode* DIniFile::FindKey(char const* section, char const* key) {
     DIniSecNode* sec = FindSection(section);
-    if (!sec) return nullptr;
+    if (!sec)
+        return nullptr;
     return (DIniKeyNode*)sec->keyList_.FindName(key);
 }
 
 void DIniFile::EraseKey(char const* section, char const* key) {
     DIniKeyNode* k = FindKey(section, key);
-    if (!k) return;
+    if (!k)
+        return;
     DFree(k->value_);
     k->Delete();
 }
 
 DIniKeyNode* DIniFile::GetKeyValue(char const* section, char const* key, char* value) {
     DIniKeyNode* k = FindKey(section, key);
-    if (k) strcpy(value, k->value_);
+    if (k)
+        strcpy(value, k->value_);
     return k;
 }
 
@@ -256,8 +272,10 @@ DIniKeyNode* DIniFile::AddKeyValue(char const* section, char const* key, char co
 }
 
 bool DIniFile::GetString(char const* section, char const* key, char const* def, char* str) {
-    if (GetKeyValue(section, key, str)) return true;
-    if (str && def) strcpy(str, def);
+    if (GetKeyValue(section, key, str))
+        return true;
+    if (str && def)
+        strcpy(str, def);
     return false;
 }
 

@@ -32,18 +32,21 @@ bool DPakFile::Open(char const* fileName) {
     switch (sPakFileMode) {
     case DPAK_DISK_FIRST:
         ok = file_.Open(fileName);
-        if (!ok) ok = OpenPack(fileName);
+        if (!ok)
+            ok = OpenPack(fileName);
         break;
     case DPAK_PACK_FIRST:
         ok = OpenPack(fileName);
-        if (!ok) ok = file_.Open(fileName);
+        if (!ok)
+            ok = file_.Open(fileName);
         break;
     }
     return ok;
 }
 
 DWORD DPakFile::Read(void* buffer, DWORD size) {
-    if (size == 0) return 0;
+    if (size == 0)
+        return 0;
     if (pakNode_) {
         size = ReadPack(buffer, size);
     } else {
@@ -62,12 +65,14 @@ DWORD DPakFile::Seek(long offset, DWORD method) {
 }
 
 DWORD DPakFile::Tell() {
-    if (pakNode_) return filePtr_;
+    if (pakNode_)
+        return filePtr_;
     return file_.Tell();
 }
 
 DWORD DPakFile::Size() {
-    if (pakNode_) return fileLen_;
+    if (pakNode_)
+        return fileLen_;
     return file_.Size();
 }
 
@@ -79,20 +84,26 @@ void DPakFile::Close() {
 }
 
 bool DPakFile::OpenPack(char const* fileName) {
-    if (!GpPakList) return false;
-    if (!fileName || !fileName[0]) return false;
+    if (!GpPakList)
+        return false;
+    if (!fileName || !fileName[0])
+        return false;
 
     DPakIndex index;
     pakNode_ = GpPakList->Find(fileName, &index);
-    if (!pakNode_) return false;
+    if (!pakNode_)
+        return false;
 
     fileOfs_ = index.fileOffset;
     fileLen_ = index.fileLength;
     blocks_ = index.fileBlocks;
 
-    if (!memFile_.Alloc(BLOCK_SIZE)) return false;
-    if (!memRead_.Alloc(BLOCK_SIZE)) return false;
-    if (!memBlock_.Alloc(blocks_ * 2)) return false;
+    if (!memFile_.Alloc(BLOCK_SIZE))
+        return false;
+    if (!memRead_.Alloc(BLOCK_SIZE))
+        return false;
+    if (!memBlock_.Alloc(blocks_ * 2))
+        return false;
 
     buffer_ = (BYTE*)memFile_.GetMemPtr();
     blockSizes_ = (WORD*)memBlock_.GetMemPtr();
@@ -146,7 +157,8 @@ DWORD DPakFile::ReadPack(void* buffer, DWORD size) {
         size -= BLOCK_SIZE;
     }
 
-    if (size == 0) return readSize;
+    if (size == 0)
+        return readSize;
 
     ReadBlock(buffer_, block);
     memcpy(outBuf, buffer_, size);
@@ -155,7 +167,8 @@ DWORD DPakFile::ReadPack(void* buffer, DWORD size) {
 }
 
 DWORD DPakFile::SeekPack(long offset, DWORD method) {
-    if (!pakNode_) return file_.Seek(offset, method);
+    if (!pakNode_)
+        return file_.Seek(offset, method);
 
     int filePtr = filePtr_;
 
@@ -191,9 +204,11 @@ DWORD DPakFile::SeekPack(long offset, DWORD method) {
 }
 
 bool DPakFile::Save(char const* fileName) {
-    if (!pakNode_) return true;
+    if (!pakNode_)
+        return true;
 
-    if (!file_.Create(fileName)) return false;
+    if (!file_.Create(fileName))
+        return false;
 
     DWORD size = fileLen_;
     int block = 0;

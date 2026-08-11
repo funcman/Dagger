@@ -25,20 +25,26 @@ bool DPakPack::Pack(char const* inFile, char const* outFile) {
     DMemory packBuf;
     DPakCodeInfo info;
 
-    if (!GpPakCode) return false;
-    if (!file.Open(inFile)) return false;
+    if (!GpPakCode)
+        return false;
+    if (!file.Open(inFile))
+        return false;
     DWORD size = file.Size();
-    if (size == DFILE_SEEK_ERROR || size <= sizeof(DPakSingleHead)) return false;
+    if (size == DFILE_SEEK_ERROR || size <= sizeof(DPakSingleHead))
+        return false;
 
     info.dataLen_ = size;
     info.packLen_ = GpPakCode->GetPackLen(info.dataLen_);
-    if (!dataBuf.Alloc(info.dataLen_)) return false;
-    if (!packBuf.Alloc(info.packLen_)) return false;
+    if (!dataBuf.Alloc(info.dataLen_))
+        return false;
+    if (!packBuf.Alloc(info.packLen_))
+        return false;
 
     file.Read(dataBuf.GetMemPtr(), info.dataLen_);
     file.Close();
 
-    if (!file.Create(outFile)) return false;
+    if (!file.Create(outFile))
+        return false;
 
     info.dataBuf_ = (BYTE*)dataBuf.GetMemPtr();
     info.packBuf_ = (BYTE*)packBuf.GetMemPtr();
@@ -61,22 +67,29 @@ bool DPakPack::UnPack(char const* inFile, char const* outFile) {
     DMemory dataBuf;
     DPakCodeInfo info;
 
-    if (!GpPakCode) return false;
-    if (!file.Open(inFile)) return false;
+    if (!GpPakCode)
+        return false;
+    if (!file.Open(inFile))
+        return false;
 
     DPakSingleHead header;
-    if (file.Read(&header, sizeof(header)) != sizeof(header)) return false;
-    if (header.magicId != PAK_MAGIC) return false;
+    if (file.Read(&header, sizeof(header)) != sizeof(header))
+        return false;
+    if (header.magicId != PAK_MAGIC)
+        return false;
 
     info.packLen_ = header.packLen;
     info.dataLen_ = header.fileLen;
-    if (!packBuf.Alloc(info.packLen_)) return false;
-    if (!dataBuf.Alloc(info.dataLen_)) return false;
+    if (!packBuf.Alloc(info.packLen_))
+        return false;
+    if (!dataBuf.Alloc(info.dataLen_))
+        return false;
 
     file.Read(packBuf.GetMemPtr(), info.packLen_);
     file.Close();
 
-    if (!file.Create(outFile)) return false;
+    if (!file.Create(outFile))
+        return false;
 
     info.dataBuf_ = (BYTE*)dataBuf.GetMemPtr();
     info.packBuf_ = (BYTE*)packBuf.GetMemPtr();

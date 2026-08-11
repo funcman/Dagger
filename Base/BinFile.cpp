@@ -13,7 +13,8 @@ DBinFile::~DBinFile() {
 
 bool DBinFile::Open(char const* fileName) {
     Close();
-    if (!fileName || !fileName[0]) return false;
+    if (!fileName || !fileName[0])
+        return false;
     char path[DMAX_PATH];
     DPathGetFull(path, fileName);
     handle_ = fopen(path, "rb");
@@ -26,7 +27,8 @@ bool DBinFile::Open(char const* fileName) {
 
 bool DBinFile::Update(char const* fileName) {
     Close();
-    if (!fileName || !fileName[0]) return false;
+    if (!fileName || !fileName[0])
+        return false;
     char path[DMAX_PATH];
     DPathGetFull(path, fileName);
     handle_ = fopen(path, "r+b");
@@ -39,7 +41,8 @@ bool DBinFile::Update(char const* fileName) {
 
 bool DBinFile::Create(char const* fileName) {
     Close();
-    if (!fileName || !fileName[0]) return false;
+    if (!fileName || !fileName[0])
+        return false;
     char path[DMAX_PATH];
     DPathGetFull(path, fileName);
     handle_ = fopen(path, "wb");
@@ -60,33 +63,39 @@ void DBinFile::Close() {
 }
 
 DWORD DBinFile::Read(void* buffer, DWORD bytes) {
-    if (!handle_ || bytes == 0) return 0;
+    if (!handle_ || bytes == 0)
+        return 0;
     DWORD read = (DWORD)fread(buffer, 1, bytes, handle_);
     pointer_ += read;
     return read;
 }
 
 DWORD DBinFile::Write(void const* buffer, DWORD bytes) {
-    if (!handle_ || bytes == 0) return 0;
+    if (!handle_ || bytes == 0)
+        return 0;
     DWORD written = (DWORD)fwrite(buffer, 1, bytes, handle_);
     pointer_ += written;
     return written;
 }
 
 DWORD DBinFile::Seek(long distance, DWORD method) {
-    if (!handle_) return DFILE_SEEK_ERROR;
-    if (fseek(handle_, distance, method) != 0) return DFILE_SEEK_ERROR;
+    if (!handle_)
+        return DFILE_SEEK_ERROR;
+    if (fseek(handle_, distance, method) != 0)
+        return DFILE_SEEK_ERROR;
     pointer_ = (DWORD)ftell(handle_);
     return pointer_;
 }
 
 DWORD DBinFile::Tell() {
-    if (!handle_) return DFILE_SEEK_ERROR;
+    if (!handle_)
+        return DFILE_SEEK_ERROR;
     return pointer_;
 }
 
 DWORD DBinFile::Size() {
-    if (!handle_) return DFILE_SEEK_ERROR;
+    if (!handle_)
+        return DFILE_SEEK_ERROR;
     if (size_ == 0) {
         long pos = ftell(handle_);
         fseek(handle_, 0, DFILE_END);

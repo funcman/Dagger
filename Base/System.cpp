@@ -32,7 +32,8 @@ static bool rootInit_ = false;
 
 static void DPathNormalize(char* path) {
     for (int i = 0; path[i]; ++i) {
-        if (path[i] == '\\') path[i] = '/';
+        if (path[i] == '\\')
+            path[i] = '/';
     }
 }
 
@@ -53,7 +54,8 @@ static void DGetExecutablePath(char* out, int len) {
     _NSGetExecutablePath(out, &size);
 #elif defined(__linux__)
     ssize_t n = readlink("/proc/self/exe", out, len - 1);
-    if (n > 0) out[n] = 0;
+    if (n > 0)
+        out[n] = 0;
 #else
     out[0] = 0;
 #endif
@@ -151,7 +153,8 @@ bool DFileExists(char const* file) {
 void DPathChangeExt(char* file, char const* ext) {
     int i;
     for (i = 0; file[i]; ++i) {
-        if (file[i] == '.') break;
+        if (file[i] == '.')
+            break;
     }
     if (file[i] == '.') {
         strcpy(&file[i], ext);
@@ -234,7 +237,8 @@ void DRandomSeed(UINT seed) {
 }
 
 long DRandom(int min, int max) {
-    if (max < min) max = min;
+    if (max < min)
+        max = min;
     return min + rand() % (max - min + 1);
 }
 
@@ -247,7 +251,8 @@ void DClipboardGetText(char* out, int len) {
         SDL_free(p);
     }
 #elif defined(_WIN32)
-    if (!OpenClipboard(NULL)) return;
+    if (!OpenClipboard(NULL))
+        return;
     HANDLE h = GetClipboardData(CF_TEXT);
     if (h) {
         char* p = (char*)GlobalLock(h);
@@ -263,7 +268,8 @@ void DClipboardSetText(char const* text) {
     SDL_SetClipboardText(text);
 #elif defined(_WIN32)
     HANDLE h = GlobalAlloc(GHND, strlen(text) + 1);
-    if (!h) return;
+    if (!h)
+        return;
     char* p = (char*)GlobalLock(h);
     DStrLCopy(p, text, (int)strlen(text));
     GlobalUnlock(h);
@@ -295,7 +301,8 @@ void DIMEOpen() {
 
 void DStrReplaceChar(char* str, char from, char to) {
     while (*str) {
-        if (*str == from) *str = to;
+        if (*str == from)
+            *str = to;
         ++str;
     }
 }
