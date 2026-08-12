@@ -33,7 +33,7 @@ static void DLibClose(DLibHandle* h) {
     delete h;
 }
 static void* DLibSym(DLibHandle* h, char const* name) {
-    return h && h->obj ? SDL_LoadFunction(h->obj, name) : nullptr;
+    return h && h->obj ? (void*)SDL_LoadFunction(h->obj, name) : nullptr;
 }
 #elif defined(_WIN32)
 struct DLibHandle {
@@ -118,13 +118,17 @@ void DPakCode::FreeLib() {
 
 void DPakCode::Encode(DPakCodeInfo* info) {
     if (handle_ && encode_) {
-        encode_(info->packBuf, &info->packLen, info->dataBuf, info->dataLen);
+        unsigned long len = info->packLen;
+        encode_(info->packBuf, &len, info->dataBuf, info->dataLen);
+        info->packLen = (DWORD)len;
     }
 }
 
 void DPakCode::Decode(DPakCodeInfo* info) {
     if (handle_ && decode_) {
-        decode_(info->dataBuf, &info->dataLen, info->packBuf, info->packLen);
+        unsigned long len = info->dataLen;
+        decode_(info->dataBuf, &len, info->packBuf, info->packLen);
+        info->dataLen = (DWORD)len;
     }
 }
 
