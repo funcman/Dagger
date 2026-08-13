@@ -5,6 +5,7 @@ add_library(DBase SHARED
     Node.cpp
     List.cpp
     HashList.cpp
+    FindList.cpp
     StrList.cpp
     Md5.cpp
     System.cpp

@@ -4,6 +4,7 @@
 #include "BinFile.h"
 #include "CsvFile.h"
 #include "Debug.h"
+#include "FindList.h"
 #include "HashList.h"
 #include "IniFile.h"
 #include "List.h"
